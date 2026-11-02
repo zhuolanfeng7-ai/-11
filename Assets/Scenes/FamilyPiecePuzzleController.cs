@@ -38,6 +38,7 @@ public sealed class FamilyPiecePuzzleController : MonoBehaviour
     private bool completionLorePending;
     private bool completionLoreShown;
     private bool everCompleted;
+    private bool rewardPresented;
     private GUIStyle headerStyle;
     private GUIStyle hintStyle;
     private GUIStyle completionStyle;
@@ -94,7 +95,7 @@ public sealed class FamilyPiecePuzzleController : MonoBehaviour
 
     private void TryOpenPuzzle()
     {
-        if (!Input.GetMouseButtonDown(0) || viewCamera == null) return;
+        if (Scene2PickupPresentation.IsPlaying || !Input.GetMouseButtonDown(0) || viewCamera == null) return;
         if (worldPiece == null) FindWorldPiece();
         if (worldPiece == null || sourceTexture == null || interactionCollider == null) return;
         Ray ray = viewCamera.ScreenPointToRay(Input.mousePosition);
@@ -184,9 +185,23 @@ public sealed class FamilyPiecePuzzleController : MonoBehaviour
                 everCompleted = true;
                 RestoreWorldColor();
                 completionLorePending = true;
+                if(!rewardPresented)
+                {
+                    rewardPresented=true;
+                    StartCoroutine(PresentRestoredMemory());
+                }
             }
             break;
         }
+    }
+
+    private IEnumerator PresentRestoredMemory()
+    {
+        // Let the final rotation render, then present the complete portrait.
+        yield return null;
+        while(Scene2PickupPresentation.IsPlaying)yield return null;
+        Scene2PickupPresentation.BeginScene1Piece(sourceTexture);
+        ClosePuzzle();
     }
 
     private void RestoreWorldColor()
@@ -238,6 +253,7 @@ public sealed class FamilyPiecePuzzleController : MonoBehaviour
         // The click that closes the puzzle must never also dismiss this lore.
         yield return null;
         while (Input.GetMouseButton(0)) yield return null;
+        while (Scene2PickupPresentation.IsPlaying) yield return null;
         WorldStartTerminal terminal = FindObjectOfType<WorldStartTerminal>();
         if (terminal == null || !terminal.IsGameStarted) yield break;
 

@@ -337,8 +337,8 @@ public class DoorCodePuzzleController : MonoBehaviour
     private void ClosePanel()
     {
         isOpen = false;
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.visible = true;
     }
 
     private void EnsureStyles()

@@ -28,6 +28,7 @@ public sealed class DrawerUpController : MonoBehaviour
 
     private void Awake()
     {
+        DrawerUpShellRepair.Ensure(transform);
         closedLocalPosition = transform.localPosition;
 
         if (interactionCamera == null)

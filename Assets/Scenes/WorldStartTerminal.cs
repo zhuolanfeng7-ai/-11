@@ -10,10 +10,10 @@ public sealed class WorldStartTerminal : MonoBehaviour
 {
     // One fixed terminal footprint for every present and future world-lore page.
     // One larger fixed footprint shared by every opening and gameplay lore card.
-    private const float TerminalWidth = 520f;
-    private const float TerminalHeight = 270f;
-    private const float TerminalLeft = 14f;
-    private const float TerminalMargin = 16f;
+    private const float TerminalWidth = WorldLoreTerminalLayout.Width;
+    private const float TerminalHeight = WorldLoreTerminalLayout.Height;
+    private const float TerminalLeft = WorldLoreTerminalLayout.Left;
+    private const float TerminalMargin = WorldLoreTerminalLayout.Bottom;
     [SerializeField, Min(0f)] private float fadeSeconds = .42f;
 
     private readonly List<Behaviour> pausedGameplay = new List<Behaviour>();
