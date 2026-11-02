@@ -1,0 +1,6 @@
+{
+  "Base": "Assets/BlenderScene3/BaoxianSource/Base.jpg",
+  "Metallic": "Assets/BlenderScene3/BaoxianSource/Metallic.JPEG",
+  "Roughness": "Assets/BlenderScene3/BaoxianSource/Roughness.JPEG",
+  "Normal": "Assets/BlenderScene3/BaoxianSource/Normal.png"
+}

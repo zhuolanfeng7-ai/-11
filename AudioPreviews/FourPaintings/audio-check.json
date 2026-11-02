@@ -1,0 +1,26 @@
+[
+  {
+    "file": "D:\\-11\\AudioPreviews\\FourPaintings\\01_声音流水线.wav",
+    "seconds": 32,
+    "peak": 0.87,
+    "rms": 0.13201042739106164
+  },
+  {
+    "file": "D:\\-11\\AudioPreviews\\FourPaintings\\02_耳朵交易所.wav",
+    "seconds": 32,
+    "peak": 0.8700000000000001,
+    "rms": 0.16312269993766515
+  },
+  {
+    "file": "D:\\-11\\AudioPreviews\\FourPaintings\\03_金币赎不回的旋律.wav",
+    "seconds": 32,
+    "peak": 0.8699999999999999,
+    "rms": 0.18219528058036652
+  },
+  {
+    "file": "D:\\-11\\AudioPreviews\\FourPaintings\\04_听觉贵宾室.wav",
+    "seconds": 32,
+    "peak": 0.87,
+    "rms": 0.18954633963565354
+  }
+]

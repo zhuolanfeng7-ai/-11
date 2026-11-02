@@ -70,15 +70,14 @@ public sealed class GlassPuzzleController : MonoBehaviour
 
     private void Update()
     {
-        if (!Input.GetMouseButtonDown(0))
-        {
-            return;
-        }
-
+        if(Input.GetMouseButtonDown(0))TryPickup(Input.mousePosition);
+    }
+    public bool TryPickup(Vector2 pointer)
+    {
         if (solved)
         {
             Log("Click ignored: this GlassPuzzle was already picked up.");
-            return;
+            return false;
         }
 
         if (player == null || interactionCamera == null || blurEffect == null || pickupCollider == null)
@@ -88,7 +87,7 @@ public sealed class GlassPuzzleController : MonoBehaviour
                 (interactionCamera == null ? "Camera " : string.Empty) +
                 (blurEffect == null ? "VisionBlurEffect " : string.Empty) +
                 (pickupCollider == null ? "Collider" : string.Empty));
-            return;
+            return false;
         }
 
         Vector3 closestPoint = pickupCollider.ClosestPoint(player.position);
@@ -96,24 +95,26 @@ public sealed class GlassPuzzleController : MonoBehaviour
         if (distance > interactionDistance)
         {
             Log($"Click blocked: player is {distance:F2} units away; allowed distance is {interactionDistance:F2}.");
-            return;
+            return false;
         }
 
-        Ray ray = interactionCamera.ScreenPointToRay(Input.mousePosition);
+        Ray ray = interactionCamera.ScreenPointToRay(pointer);
         if (!Physics.Raycast(ray, out RaycastHit hit, clickRayDistance, ~0, QueryTriggerInteraction.Collide))
         {
             Log("Click blocked: raycast hit nothing. Check that the Collider is enabled and that the mouse is over the glasses.");
-            return;
+            return false;
         }
 
         bool hitPickupCollider = hit.collider == pickupCollider || hit.collider.transform.IsChildOf(pickupCollider.transform);
         if (!hitPickupCollider)
         {
             Log($"Click blocked: ray hit '{NameOf(hit.collider)}' instead of the glasses collider '{NameOf(pickupCollider)}'.");
-            return;
+            return false;
         }
 
         solved = true;
+        var pickupMesh=glassTarget?glassTarget.GetComponentInChildren<MeshFilter>(true):null;
+        if(pickupMesh)Scene2PickupPresentation.BeginScene1Glasses(pickupMesh,pickupMesh.GetComponent<Renderer>());
         Log($"Pickup succeeded: ray hit '{NameOf(hit.collider)}'. Hiding glasses and clearing blur over {clearDuration:F2} seconds.");
 
         if (hideGlassOnPickup && glassTarget != null)
@@ -124,6 +125,7 @@ public sealed class GlassPuzzleController : MonoBehaviour
         pickupCollider.enabled = false;
         StartCoroutine(ClearVision());
         StartCoroutine(ShowVisualLoreAfterDelay());
+        return true;
     }
 
     private IEnumerator ClearVision()

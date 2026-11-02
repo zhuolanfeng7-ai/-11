@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Minimal first-person controller: hold W to move and use the mouse horizontally to turn.
+/// First-person controller: WASD movement, direct mouse look and a visible pointer.
 /// Attach this component to an existing Player. It only uses an existing camera
 /// and never creates a Player or Camera.
 /// </summary>
@@ -53,19 +53,25 @@ public sealed class FirstPersonPlayer : MonoBehaviour
         initialPlayerRoll = NormalizeAngle(playerAngles.z);
         cameraPitch = 0f;
         UpdateCameraTransform();
-        SetCursorConfined();
+        SetCursorLocked(true);
     }
 
     private void Update()
     {
+        if(Scene2RepairCelebration.IsPlaying||EarSafeInstallation.BlocksPlayerInput||Scene2PlateInstallation.BlocksWorldInput||Scene2WorldIntroduction.BlocksWorldInput||Scene2PickupPresentation.IsPlaying){movementInput=Vector3.zero;return;}
         UpdateCursorLock();
 
         if (Application.isFocused && Cursor.lockState != CursorLockMode.None)
         {
-            LookWithMouse();
+            // Keep the view stable on the left-click frame so object selection
+            // uses the pose shown to the player, then resume mouse look.
+            if (!Input.GetMouseButtonDown(0)) LookWithMouse();
         }
 
         ReadMovementInput();
+        if(movementInput.sqrMagnitude>.0001f&&
+            (Input.GetKey(KeyCode.W)||Input.GetKey(KeyCode.S)||Input.GetKey(KeyCode.A)||Input.GetKey(KeyCode.D)))
+            Scene2WorldIntroduction.NotifyPlayerWalking();
     }
 
     private void FixedUpdate()
@@ -96,20 +102,29 @@ public sealed class FirstPersonPlayer : MonoBehaviour
 
     private void ReadMovementInput()
     {
-        Vector3 forward = Vector3.ProjectOnPlane(viewCamera.forward, Vector3.up).normalized;
-        float direction = 0f;
-
-        if (Input.GetKey(KeyCode.W))
+        if (!Application.isFocused || Cursor.lockState == CursorLockMode.None)
         {
-            direction += 1f;
+            movementInput = Vector3.zero;
+            return;
         }
+        Vector2 input = new Vector2(
+            (Input.GetKey(KeyCode.D) ? 1f : 0f) - (Input.GetKey(KeyCode.A) ? 1f : 0f),
+            (Input.GetKey(KeyCode.W) ? 1f : 0f) - (Input.GetKey(KeyCode.S) ? 1f : 0f));
+        movementInput = CalculatePlanarMovement(input, viewCamera.forward);
+    }
 
-        if (Input.GetKey(KeyCode.S))
-        {
-            direction -= 1f;
-        }
+    public static Vector3 CalculatePlanarMovement(Vector2 input, Vector3 viewForward)
+    {
+        Vector3 forward = Vector3.ProjectOnPlane(viewForward, Vector3.up).normalized;
+        Vector3 right = Vector3.Cross(Vector3.up, forward);
+        return Vector3.ClampMagnitude(right * input.x + forward * input.y, 1f);
+    }
 
-        movementInput = forward * direction;
+    private void OnDisable()
+    {
+        movementInput = Vector3.zero;
+        if (playerBody != null && !playerBody.isKinematic)
+            playerBody.velocity = new Vector3(0f, playerBody.velocity.y, 0f);
     }
 
     private void UpdateCursorLock()
@@ -118,13 +133,9 @@ public sealed class FirstPersonPlayer : MonoBehaviour
         {
             SetCursorLocked(false);
         }
-        else if (Input.GetMouseButtonDown(1))
+        else if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
         {
             SetCursorLocked(true);
-        }
-        else if (Input.GetMouseButtonUp(1))
-        {
-            SetCursorConfined();
         }
     }
 
@@ -166,7 +177,7 @@ public sealed class FirstPersonPlayer : MonoBehaviour
 
         // Keep the camera outside the imported model hierarchy. The Player uses an
         // X-axis correction of -90 degrees, which a child camera would inherit.
-        if (viewCamera.IsChildOf(transform))
+        if (viewCamera.IsChildOf(transform) && playerCamera.GetComponent<Scene2RobotCameraFollow>() == null)
         {
             viewCamera.SetParent(null, true);
         }
@@ -181,14 +192,22 @@ public sealed class FirstPersonPlayer : MonoBehaviour
             return;
         }
 
+        var eyeView = playerCamera.GetComponent<Scene2RobotCameraFollow>();
+        if (eyeView != null)
+        {
+            if (!eyeView.IsEyeView) eyeView.Bind(transform);
+            eyeView.SetEyePitch(cameraPitch);
+            eyeView.SnapToTarget();
+            return;
+        }
         viewCamera.position = transform.position + Vector3.up * cameraHeight;
         viewCamera.rotation = Quaternion.Euler(cameraPitch, horizontalLook, 0f);
     }
 
     private static void SetCursorLocked(bool locked)
     {
-        Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
-        Cursor.visible = !locked;
+        Cursor.lockState = locked ? CursorLockMode.Confined : CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     private static void SetCursorConfined()
@@ -222,3 +241,4 @@ public sealed class FirstPersonPlayer : MonoBehaviour
         Debug.Log("[Player State] Film acquired. HasFilm = true", this);
     }
 }
+

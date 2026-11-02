@@ -1,9 +1,10 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 /// <summary>
 /// Draws the hover scanner in OnGUI, after the camera's black-and-white/blur effect.
 /// The scanner therefore remains purple and green even while the 3D world is monochrome.
 /// </summary>
+[DefaultExecutionOrder(11000)]
 public sealed class HoverScanHighlight : MonoBehaviour
 {
     [SerializeField] private Transform visualRoot;
@@ -21,9 +22,21 @@ public sealed class HoverScanHighlight : MonoBehaviour
     private FirstPersonPlayer player;
     private Rect hoverRect;
     private bool hovered;
+    private TelescopingDevice telescopingDevice;
+    [SerializeField] private TubeRewardReveal revealOwner;
+    private bool sharedDeviceOverlay;
+    private MeshFilter[] proxySources;
+    private Transform[] proxyTransforms;
+    [SerializeField] private bool scene2Object;
+    [SerializeField] private MusicBoxRewardLift crankReward;
+    [SerializeField] private Transform occlusionHousing;
+    public void ConfigureOcclusionHousing(Transform housing){occlusionHousing=housing;}
+    public bool IsHovered => hovered;
 
     private void Awake()
     {
+        if(string.Equals(gameObject.scene.name.Replace(" ",""),"scene2",System.StringComparison.OrdinalIgnoreCase))scene2Object=true;
+        telescopingDevice = GetComponent<TelescopingDevice>();
         if (visualRoot == null) visualRoot = transform;
         if (viewCamera == null) viewCamera = Camera.main != null ? Camera.main : FindObjectOfType<Camera>();
         player = FindObjectOfType<FirstPersonPlayer>();
@@ -38,8 +51,13 @@ public sealed class HoverScanHighlight : MonoBehaviour
         hoverDistance = maximumDistance;
     }
 
+    public void ConfigureReward(TubeRewardReveal owner){revealOwner=owner;}
+    public void ConfigureScene2(){scene2Object=true;}
+    public void ConfigureCrankReward(MusicBoxRewardLift reward){crankReward=reward;scene2Object=true;}
+
     private void Update()
     {
+        if (telescopingDevice != null || revealOwner != null || scene2Object) return;
         if (viewCamera == null) viewCamera = Camera.main != null ? Camera.main : FindObjectOfType<Camera>();
         hovered = false;
         if (lavenderOverlayRoot != null) lavenderOverlayRoot.gameObject.SetActive(false);
@@ -52,6 +70,72 @@ public sealed class HoverScanHighlight : MonoBehaviour
         if (Vector3.Distance(distanceOrigin.position, hit.collider.ClosestPoint(distanceOrigin.position)) > hoverDistance) return;
         hovered = TryGetScreenRect(out hoverRect);
         if (lavenderOverlayRoot != null) lavenderOverlayRoot.gameObject.SetActive(hovered);
+    }
+
+    private void LateUpdate()
+    {
+        if (telescopingDevice == null && revealOwner == null && !scene2Object) return;
+        var camera = viewCamera != null ? viewCamera : Camera.main;
+        Vector2 pointer = Cursor.lockState == CursorLockMode.Locked && camera != null
+            ? camera.pixelRect.center : (Vector2)Input.mousePosition;
+        RefreshDeviceHover(camera, pointer);
+    }
+
+    public bool RefreshDeviceHover(Camera camera, Vector2 pointer)
+    {
+        hovered = false;
+        if (lavenderOverlayRoot != null) lavenderOverlayRoot.gameObject.SetActive(false);
+        if ((telescopingDevice == null && revealOwner == null && !scene2Object) || camera == null || !camera.pixelRect.Contains(pointer)) return false;
+        if(EvidenceInspect.BlocksWorldInput)return false;
+        if (revealOwner != null && !revealOwner.IsRevealed) return false;
+        if (crankReward != null && !crankReward.IsRaised) return false;
+        viewCamera = camera;
+        if(proxySources!=null)for(int i=0;i<proxySources.Length;i++)if(proxySources[i]&&proxyTransforms[i]){
+            proxyTransforms[i].SetPositionAndRotation(proxySources[i].transform.position,proxySources[i].transform.rotation);
+            proxyTransforms[i].localScale=proxySources[i].transform.lossyScale;
+        }
+        var originalRenderer = visualRoot.GetComponent<Renderer>();
+        if (originalRenderer == null || !originalRenderer.enabled) return false;
+        SyncOverlayCamera();
+        Ray ray = camera.ScreenPointToRay(pointer);
+        ray.origin = camera.transform.position;
+        Physics.SyncTransforms();
+        if (telescopingDevice != null){
+            if (!telescopingDevice.CanInteract(ray, camera.transform.position, camera.farClipPlane)) return false;
+        } else {
+            Collider target=GetComponent<Collider>();
+            if(!target || !target.enabled)return false;
+            Vector3 closest=target is MeshCollider mesh && !mesh.convex
+                ? target.bounds.ClosestPoint(camera.transform.position) : target.ClosestPoint(camera.transform.position);
+            if(Vector3.Distance(camera.transform.position,closest)>hoverDistance+.001f)return false;
+            var hits=Physics.RaycastAll(ray,camera.farClipPlane,~0,QueryTriggerInteraction.Ignore);
+            System.Array.Sort(hits,(a,b)=>a.distance.CompareTo(b.distance));
+            bool hitReward=false;
+            foreach(var hit in hits){
+                if(player && hit.transform.IsChildOf(player.transform))continue;
+                hitReward=hit.transform==transform || hit.transform.IsChildOf(transform);
+                if(hitReward)break;
+                if(occlusionHousing && (hit.transform==occlusionHousing || hit.transform.IsChildOf(occlusionHousing)))continue;
+                break;
+            }
+            if(!hitReward)return false;
+        }
+        hovered = TryGetScreenRect(out hoverRect);
+        if (hovered)
+        {
+            // At close range the tall tube can extend beyond the Game view.
+            // Keep the selection frame within the visible viewport.
+            float margin=Mathf.Clamp(framePaddingPixels,4f,10f)*1.5f;
+            Rect viewport=camera.pixelRect;
+            float left=Mathf.Max(hoverRect.xMin,viewport.xMin+margin);
+            float right=Mathf.Min(hoverRect.xMax,viewport.xMax-margin);
+            float bottom=Mathf.Max(hoverRect.yMin,viewport.yMin+margin);
+            float top=Mathf.Min(hoverRect.yMax,viewport.yMax-margin);
+            hoverRect=Rect.MinMaxRect(left,bottom,right,top);
+            hovered=right>left && top>bottom;
+        }
+        if (lavenderOverlayRoot != null) lavenderOverlayRoot.gameObject.SetActive(hovered);
+        return hovered;
     }
 
     private void OnGUI()
@@ -73,8 +157,12 @@ public sealed class HoverScanHighlight : MonoBehaviour
         // A second camera renders these proxy meshes after the monochrome camera effect.
         // The original glasses stay untouched for gameplay, colliders, and pickup.
         const int overlayLayer = 31;
-        GameObject cameraObject = new GameObject("Lavender Hover Overlay Camera");
-        overlayCamera = cameraObject.AddComponent<Camera>();
+        sharedDeviceOverlay=telescopingDevice != null || revealOwner != null || scene2Object;
+        GameObject cameraObject=sharedDeviceOverlay ? GameObject.Find("Scene2 Hover Overlay Camera") : null;
+        if(cameraObject==null){
+            cameraObject=new GameObject(sharedDeviceOverlay ? "Scene2 Hover Overlay Camera" : "Lavender Hover Overlay Camera");
+            overlayCamera=cameraObject.AddComponent<Camera>();
+        } else overlayCamera=cameraObject.GetComponent<Camera>();
         // Preserve the main camera's depth buffer.  Clearing it here made a hidden
         // object (such as the Film inside the drawer) appear to glow through the
         // drawer and book, which visually detached the glow from the Film.
@@ -85,16 +173,22 @@ public sealed class HoverScanHighlight : MonoBehaviour
         overlayCamera.allowMSAA = true;
         Shader rimShader = Shader.Find("Custom/HoverLavenderRim");
         if (rimShader == null) return;
+        // Scene2 uses the same dedicated overlay layer as the Scene1 scanner.
+        // Render its tint only once, through the overlay camera.
+        if (sharedDeviceOverlay && viewCamera != null) viewCamera.cullingMask &= ~(1 << overlayLayer);
         lavenderMaterial = new Material(rimShader);
         lavenderMaterial.SetColor("_RimColor", new Color(.55f, .28f, .90f, .34f));
         lavenderMaterial.SetFloat("_RimPower", 2.8f);
 
         lavenderOverlayRoot = new GameObject("Lavender Glasses Hover Overlay").transform;
         MeshFilter[] filters = visualRoot.GetComponentsInChildren<MeshFilter>(true);
+        var sources=new System.Collections.Generic.List<MeshFilter>();
+        var proxies=new System.Collections.Generic.List<Transform>();
         foreach (MeshFilter source in filters)
         {
             if (source.sharedMesh == null) continue;
             GameObject proxy = new GameObject(source.name + " Lavender Proxy");
+            sources.Add(source);proxies.Add(proxy.transform);
             proxy.layer = overlayLayer;
             proxy.transform.SetParent(lavenderOverlayRoot, true);
             proxy.transform.SetPositionAndRotation(source.transform.position, source.transform.rotation);
@@ -107,6 +201,7 @@ public sealed class HoverScanHighlight : MonoBehaviour
             for (int i = 0; i < materials.Length; i++) materials[i] = lavenderMaterial;
             renderer.sharedMaterials = materials;
         }
+        proxySources=sources.ToArray();proxyTransforms=proxies.ToArray();
         lavenderOverlayRoot.gameObject.SetActive(false);
         SyncOverlayCamera();
     }
@@ -186,6 +281,6 @@ public sealed class HoverScanHighlight : MonoBehaviour
         if (greenFrame != null) Destroy(greenFrame);
         if (lavenderMaterial != null) Destroy(lavenderMaterial);
         if (lavenderOverlayRoot != null) Destroy(lavenderOverlayRoot.gameObject);
-        if (overlayCamera != null) Destroy(overlayCamera.gameObject);
+        if (overlayCamera != null && !sharedDeviceOverlay) Destroy(overlayCamera.gameObject);
     }
 }
