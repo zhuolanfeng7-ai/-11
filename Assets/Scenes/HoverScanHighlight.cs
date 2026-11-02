@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 /// <summary>
 /// Draws the hover scanner in OnGUI, after the camera's black-and-white/blur effect.
@@ -10,6 +12,9 @@ public sealed class HoverScanHighlight : MonoBehaviour
     [SerializeField] private Camera viewCamera;
     [SerializeField] private Color purple = new Color(.78f, .20f, 1f, .95f);
     [SerializeField] private Color green = new Color(.15f, 1f, .42f, .9f);
+    [Header("Pickup Soft Full-Surface Glow")]
+    [SerializeField] private Color pickupFlashColor = Color.white;
+    [SerializeField, Min(0f)] private float pickupFlashIntensity = 0.55f;
     [SerializeField, Min(1f)] private float framePaddingPixels = 20f;
     [SerializeField, Min(.1f)] private float hoverDistance = 5f;
 
@@ -18,9 +23,14 @@ public sealed class HoverScanHighlight : MonoBehaviour
     private Transform lavenderOverlayRoot;
     private Camera overlayCamera;
     private Material lavenderMaterial;
+    private Material whiteGlowMaterial;
     private FirstPersonPlayer player;
     private Rect hoverRect;
     private bool hovered;
+    private bool forcedHighlight;
+    private readonly List<Transform> overlaySources = new List<Transform>();
+    private readonly List<Transform> overlayProxies = new List<Transform>();
+    private readonly List<MeshRenderer> overlayRenderers = new List<MeshRenderer>();
 
     private void Awake()
     {
@@ -38,6 +48,32 @@ public sealed class HoverScanHighlight : MonoBehaviour
         hoverDistance = maximumDistance;
     }
 
+    public void SetForcedHighlight(bool enabled)
+    {
+        forcedHighlight = enabled;
+        ApplyOverlayMaterial(enabled ? whiteGlowMaterial : lavenderMaterial);
+        if (enabled)
+            SetForcedHighlightIntensity(1f);
+        if (!enabled)
+        {
+            hovered = false;
+            if (lavenderOverlayRoot != null)
+                lavenderOverlayRoot.gameObject.SetActive(false);
+        }
+    }
+
+    public void SetForcedHighlightIntensity(float normalizedIntensity)
+    {
+        if (whiteGlowMaterial == null) return;
+        float intensity = Mathf.Clamp01(normalizedIntensity);
+        whiteGlowMaterial.SetFloat("_GlowIntensity", pickupFlashIntensity * intensity);
+        whiteGlowMaterial.SetColor("_RimColor", new Color(
+            pickupFlashColor.r,
+            pickupFlashColor.g,
+            pickupFlashColor.b,
+            pickupFlashColor.a * intensity));
+    }
+
     private void Update()
     {
         if (viewCamera == null) viewCamera = Camera.main != null ? Camera.main : FindObjectOfType<Camera>();
@@ -45,6 +81,15 @@ public sealed class HoverScanHighlight : MonoBehaviour
         if (lavenderOverlayRoot != null) lavenderOverlayRoot.gameObject.SetActive(false);
         if (viewCamera == null) return;
         SyncOverlayCamera();
+        SyncOverlayVisuals();
+
+        if (forcedHighlight)
+        {
+            hovered = TryGetScreenRect(out hoverRect);
+            if (lavenderOverlayRoot != null) lavenderOverlayRoot.gameObject.SetActive(hovered);
+            return;
+        }
+
         Ray ray = viewCamera.ScreenPointToRay(Input.mousePosition);
         if (!Physics.Raycast(ray, out RaycastHit hit, 100f, ~0, QueryTriggerInteraction.Collide)) return;
         if (hit.transform != transform && !hit.transform.IsChildOf(transform)) return;
@@ -56,6 +101,7 @@ public sealed class HoverScanHighlight : MonoBehaviour
 
     private void OnGUI()
     {
+        if (forcedHighlight) return;
         if (!hovered || purpleFrame == null || greenFrame == null) return;
         // GUI y is top-down, while camera screen coordinates are bottom-up.
         Rect guiRect = new Rect(hoverRect.x, Screen.height - hoverRect.yMax, hoverRect.width, hoverRect.height);
@@ -88,6 +134,20 @@ public sealed class HoverScanHighlight : MonoBehaviour
         lavenderMaterial = new Material(rimShader);
         lavenderMaterial.SetColor("_RimColor", new Color(.55f, .28f, .90f, .34f));
         lavenderMaterial.SetFloat("_RimPower", 2.8f);
+        lavenderMaterial.SetFloat("_GlowIntensity", 1f);
+        lavenderMaterial.SetFloat("_Additive", 0f);
+        lavenderMaterial.SetFloat("_FullSurfaceGlow", 0f);
+        lavenderMaterial.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
+        lavenderMaterial.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
+
+        whiteGlowMaterial = new Material(rimShader);
+        whiteGlowMaterial.SetColor("_RimColor", pickupFlashColor);
+        whiteGlowMaterial.SetFloat("_RimPower", 2.8f);
+        whiteGlowMaterial.SetFloat("_GlowIntensity", pickupFlashIntensity);
+        whiteGlowMaterial.SetFloat("_Additive", 1f);
+        whiteGlowMaterial.SetFloat("_FullSurfaceGlow", 1f);
+        whiteGlowMaterial.SetInt("_SrcBlend", (int)BlendMode.One);
+        whiteGlowMaterial.SetInt("_DstBlend", (int)BlendMode.One);
 
         lavenderOverlayRoot = new GameObject("Lavender Glasses Hover Overlay").transform;
         MeshFilter[] filters = visualRoot.GetComponentsInChildren<MeshFilter>(true);
@@ -106,9 +166,36 @@ public sealed class HoverScanHighlight : MonoBehaviour
             Material[] materials = new Material[materialCount];
             for (int i = 0; i < materials.Length; i++) materials[i] = lavenderMaterial;
             renderer.sharedMaterials = materials;
+            overlaySources.Add(source.transform);
+            overlayProxies.Add(proxy.transform);
+            overlayRenderers.Add(renderer);
         }
         lavenderOverlayRoot.gameObject.SetActive(false);
         SyncOverlayCamera();
+    }
+
+    private void ApplyOverlayMaterial(Material material)
+    {
+        if (material == null) return;
+        foreach (MeshRenderer renderer in overlayRenderers)
+        {
+            if (renderer == null) continue;
+            int count = Mathf.Max(1, renderer.sharedMaterials.Length);
+            Material[] materials = new Material[count];
+            for (int i = 0; i < count; i++) materials[i] = material;
+            renderer.sharedMaterials = materials;
+        }
+    }
+
+    private void SyncOverlayVisuals()
+    {
+        int count = Mathf.Min(overlaySources.Count, overlayProxies.Count);
+        for (int i = 0; i < count; i++)
+        {
+            if (overlaySources[i] == null || overlayProxies[i] == null) continue;
+            overlayProxies[i].SetPositionAndRotation(overlaySources[i].position, overlaySources[i].rotation);
+            overlayProxies[i].localScale = overlaySources[i].lossyScale;
+        }
     }
 
     private void SyncOverlayCamera()
@@ -176,6 +263,7 @@ public sealed class HoverScanHighlight : MonoBehaviour
         // The purple rim is rendered by a separate overlay object, so disabling
         // the pickup model alone would otherwise leave that proxy visible.
         hovered = false;
+        forcedHighlight = false;
         if (lavenderOverlayRoot != null)
             lavenderOverlayRoot.gameObject.SetActive(false);
     }
@@ -185,6 +273,7 @@ public sealed class HoverScanHighlight : MonoBehaviour
         if (purpleFrame != null) Destroy(purpleFrame);
         if (greenFrame != null) Destroy(greenFrame);
         if (lavenderMaterial != null) Destroy(lavenderMaterial);
+        if (whiteGlowMaterial != null) Destroy(whiteGlowMaterial);
         if (lavenderOverlayRoot != null) Destroy(lavenderOverlayRoot.gameObject);
         if (overlayCamera != null) Destroy(overlayCamera.gameObject);
     }

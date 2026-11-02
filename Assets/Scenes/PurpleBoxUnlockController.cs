@@ -103,6 +103,14 @@ public sealed class PurpleBoxUnlockController : MonoBehaviour
         return null;
     }
 
+    private Transform FindLidPivot()
+    {
+        foreach (Transform child in GetComponentsInChildren<Transform>(true))
+            if (string.Equals(child.name, "Pivot", System.StringComparison.OrdinalIgnoreCase))
+                return child;
+        return null;
+    }
+
     private IEnumerator OpenPurpleLid()
     {
         Transform lid = FindPurpleLid();
@@ -112,11 +120,20 @@ public sealed class PurpleBoxUnlockController : MonoBehaviour
             yield break;
         }
 
-        // A suitcase lid must pivot along its rear lower edge, rather than spin
-        // around its visual centre.  Build that hinge without editing the scene.
-        Transform hinge = CreateLidHinge(lid);
+        Transform hinge = FindLidPivot();
+        if (hinge == null)
+        {
+            Debug.LogWarning("[PurpleBox] Unlock complete, but no 'Pivot' was found under the purple box.");
+            yield break;
+        }
+
+        // The scene-authored Pivot defines the exact hinge position and axis.
+        // Preserve the lid's world transform when placing it under that pivot.
+        if (lid.parent != hinge)
+            lid.SetParent(hinge, true);
+
         Quaternion closedRotation = hinge.localRotation;
-        Quaternion openRotation = closedRotation * Quaternion.Euler(-90f, 0f, 0f);
+        Quaternion openRotation = closedRotation * Quaternion.Euler(-60f, 0f, 0f);
         float elapsed = 0f;
         while (elapsed < lidOpenDuration)
         {
@@ -125,39 +142,7 @@ public sealed class PurpleBoxUnlockController : MonoBehaviour
             yield return null;
         }
         hinge.localRotation = openRotation;
-        Debug.Log("[PurpleBox] purple up opened 90 degrees.");
-    }
-
-    private static Transform CreateLidHinge(Transform lid)
-    {
-        Bounds bounds = GetCombinedBounds(lid);
-        Vector3 rear = -lid.forward;
-        float rearRadius = ProjectedBoundsRadius(bounds, rear);
-        float downRadius = ProjectedBoundsRadius(bounds, -lid.up);
-        Vector3 hingePosition = bounds.center + rear * rearRadius - lid.up * downRadius;
-
-        GameObject hingeObject = new GameObject("PurpleUpHingeRuntime");
-        Transform hinge = hingeObject.transform;
-        Transform originalParent = lid.parent;
-        hinge.SetParent(originalParent, true);
-        hinge.SetPositionAndRotation(hingePosition, lid.rotation);
-        lid.SetParent(hinge, true);
-        return hinge;
-    }
-
-    private static Bounds GetCombinedBounds(Transform root)
-    {
-        Renderer[] renderers = root.GetComponentsInChildren<Renderer>(true);
-        if (renderers.Length == 0) return new Bounds(root.position, Vector3.one * .01f);
-        Bounds bounds = renderers[0].bounds;
-        for (int i = 1; i < renderers.Length; i++) bounds.Encapsulate(renderers[i].bounds);
-        return bounds;
-    }
-
-    private static float ProjectedBoundsRadius(Bounds bounds, Vector3 direction)
-    {
-        Vector3 abs = new Vector3(Mathf.Abs(direction.x), Mathf.Abs(direction.y), Mathf.Abs(direction.z));
-        return bounds.extents.x * abs.x + bounds.extents.y * abs.y + bounds.extents.z * abs.z;
+        Debug.Log("[PurpleBox] purple up opened -60 degrees around Pivot local X.");
     }
 
     private Transform GetKeyholeAnchor(Vector3 keyholePosition, Vector3 outwardNormal)

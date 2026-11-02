@@ -4,11 +4,16 @@ Shader "Custom/HoverLavenderRim"
     {
         _RimColor ("Lavender Rim", Color) = (0.55, 0.28, 0.9, 0.34)
         _RimPower ("Rim Width", Range(0.5, 8)) = 2.8
+        [HideInInspector] _GlowIntensity ("Glow Intensity", Float) = 1
+        [HideInInspector] _Additive ("Additive Mode", Float) = 0
+        [HideInInspector] _FullSurfaceGlow ("Full Surface Glow", Float) = 0
+        [HideInInspector] _SrcBlend ("Source Blend", Float) = 5
+        [HideInInspector] _DstBlend ("Destination Blend", Float) = 10
     }
     SubShader
     {
         Tags { "Queue"="Transparent" "RenderType"="Transparent" }
-        Blend SrcAlpha OneMinusSrcAlpha
+        Blend [_SrcBlend] [_DstBlend]
         ZWrite Off
         Cull Off
         Pass
@@ -21,6 +26,9 @@ Shader "Custom/HoverLavenderRim"
             struct v2f { float4 vertex : SV_POSITION; float3 worldNormal : TEXCOORD0; float3 worldPosition : TEXCOORD1; };
             fixed4 _RimColor;
             float _RimPower;
+            float _GlowIntensity;
+            float _Additive;
+            float _FullSurfaceGlow;
             v2f vert (appdata v)
             {
                 v2f o;
@@ -33,7 +41,10 @@ Shader "Custom/HoverLavenderRim"
             {
                 float3 viewDirection = normalize(_WorldSpaceCameraPos - i.worldPosition);
                 float edge = pow(1 - saturate(abs(dot(normalize(i.worldNormal), viewDirection))), _RimPower);
-                return fixed4(_RimColor.rgb, _RimColor.a * edge);
+                float glowMask = lerp(edge, 1.0, saturate(_FullSurfaceGlow));
+                float3 additiveGlow = _RimColor.rgb * glowMask * _RimColor.a * _GlowIntensity;
+                float3 outputColor = lerp(_RimColor.rgb, additiveGlow, saturate(_Additive));
+                return fixed4(outputColor, _RimColor.a * glowMask);
             }
             ENDCG
         }

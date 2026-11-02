@@ -59,6 +59,9 @@ public sealed class ImportantItemCollectionUI : MonoBehaviour
 
     private void OnGUI()
     {
+        // The right-side archive is now a concrete Canvas hierarchy created in
+        // Edit Mode. Keep this legacy renderer only as a fallback for old scenes.
+        if (GameObject.Find("RightInventoryPanel") != null) return;
         if (terminal != null && !terminal.IsGameStarted) return;
 
         float scale = Mathf.Clamp(Screen.height / 900f, .75f, 1.15f);
