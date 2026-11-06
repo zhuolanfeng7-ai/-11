@@ -41,6 +41,9 @@ public sealed class FirstPersonPlayer : MonoBehaviour
         playerBody = GetComponent<Rigidbody>();
         playerBody.constraints |= RigidbodyConstraints.FreezeRotation;
         playerBody.interpolation = RigidbodyInterpolation.Interpolate;
+        playerBody.detectCollisions = true;
+        playerBody.collisionDetectionMode = playerBody.isKinematic
+            ? CollisionDetectionMode.ContinuousSpeculative : CollisionDetectionMode.ContinuousDynamic;
         if (!FindExistingViewCamera())
         {
             enabled = false;
@@ -241,4 +244,5 @@ public sealed class FirstPersonPlayer : MonoBehaviour
         Debug.Log("[Player State] Film acquired. HasFilm = true", this);
     }
 }
+
 

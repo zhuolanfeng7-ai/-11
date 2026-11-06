@@ -40,7 +40,7 @@ public sealed class Scene2SelfMonitor : MonoBehaviour
         Frame=frame.GetComponent<RectTransform>();Frame.anchorMin=Frame.anchorMax=Frame.pivot=Vector2.one;
         Frame.anchoredPosition=new Vector2(-1.2000122f,-.7000122f);Frame.sizeDelta=new Vector2(195,120);
         var border=frame.GetComponent<Image>();border.color=new Color(1,1,1,.392f);border.raycastTarget=false;
-        border.sprite=Resources.GetBuiltinResource<Sprite>("UI/Skin/UISprite.psd");border.type=Image.Type.Sliced;
+        border.type=Image.Type.Simple;
         var screen=new GameObject("MonitorImage",typeof(RectTransform),typeof(RawImage));screen.transform.SetParent(Frame,false);
         var rect=screen.GetComponent<RectTransform>();rect.anchorMin=Vector2.zero;rect.anchorMax=Vector2.one;rect.sizeDelta=new Vector2(-12,-12);rect.anchoredPosition=Vector2.zero;
         Feed=new RenderTexture(732,432,24,RenderTextureFormat.ARGB32){name="Scene2 Live Robot Monitor",antiAliasing=2};Feed.Create();

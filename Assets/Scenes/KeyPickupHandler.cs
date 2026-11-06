@@ -9,12 +9,16 @@ public sealed class KeyPickupHandler : MonoBehaviour
     private Camera viewCamera;
     private FirstPersonPlayer player;
     private bool collected;
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetState(){HasCollected=false;visualSource=null;}
 
     private void Awake()
     {
         visualSource = gameObject;
         player = FindObjectOfType<FirstPersonPlayer>();
         viewCamera = player != null ? player.PlayerCamera : Camera.main;
+        var hover=GetComponent<HoverScanHighlight>();if(!hover)hover=gameObject.AddComponent<HoverScanHighlight>();
+        hover.enabled=true;hover.Configure(6,PickupDistance);hover.ConfigureViewCamera(viewCamera);
     }
 
     private void Update()

@@ -166,6 +166,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}
@@ -440,6 +442,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}
@@ -484,6 +488,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}
@@ -528,6 +534,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}
@@ -1170,6 +1178,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}
@@ -1269,6 +1279,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}
@@ -1631,6 +1643,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}
@@ -1675,6 +1689,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}
@@ -1719,6 +1735,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}
@@ -2165,7 +2183,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 192c823e3a8bcd6429d06f3df11f9b1a, type: 2}
-  - {fileID: 2100000, guid: 30ab7404fad359641bfe4c0fceb92c58, type: 2}
+  - {fileID: 2100000, guid: be543cceabf62464a8abcc327f5316a3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2232,6 +2250,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}
@@ -2367,6 +2387,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}
@@ -5143,6 +5165,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}
@@ -5441,6 +5465,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}
@@ -5597,6 +5623,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}
@@ -5797,6 +5825,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 160
   revealOwner: {fileID: 0}
@@ -6423,6 +6453,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 1202081719}
@@ -6749,6 +6781,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}

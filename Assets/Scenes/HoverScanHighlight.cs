@@ -28,12 +28,26 @@ public sealed class HoverScanHighlight : MonoBehaviour
     private Rect hoverRect;
     private bool hovered;
     private bool forcedHighlight;
+    private bool persistentHighlight;
+    public bool PersistentHighlight=>persistentHighlight;
     private readonly List<Transform> overlaySources = new List<Transform>();
     private readonly List<Transform> overlayProxies = new List<Transform>();
     private readonly List<MeshRenderer> overlayRenderers = new List<MeshRenderer>();
 
+    private TelescopingDevice telescopingDevice;
+    [SerializeField] private TubeRewardReveal revealOwner;
+    private bool sharedDeviceOverlay;
+    [SerializeField] private bool scene2Object;
+    [SerializeField] private MusicBoxRewardLift crankReward;
+    [SerializeField] private Transform occlusionHousing;
+    public void ConfigureOcclusionHousing(Transform housing){occlusionHousing=housing;}
+    public bool IsHovered => hovered;
+
+
     private void Awake()
     {
+        scene2Object=scene2Object||string.Equals(gameObject.scene.name.Replace(" ",""),"scene2",System.StringComparison.OrdinalIgnoreCase);
+        telescopingDevice=GetComponent<TelescopingDevice>();
         if (visualRoot == null) visualRoot = transform;
         if (viewCamera == null) viewCamera = Camera.main != null ? Camera.main : FindObjectOfType<Camera>();
         player = FindObjectOfType<FirstPersonPlayer>();
@@ -47,6 +61,21 @@ public sealed class HoverScanHighlight : MonoBehaviour
         framePaddingPixels = paddingPixels;
         hoverDistance = maximumDistance;
     }
+    public void ConfigureViewCamera(Camera camera){if(camera)viewCamera=camera;}
+    public void SetPersistentHighlight(bool value){persistentHighlight=value;}
+    public void ConfigureVisualRoot(Transform root)
+    {
+        if(!root||visualRoot==root)return;
+        visualRoot=root;
+        if(lavenderOverlayRoot){lavenderOverlayRoot.gameObject.SetActive(false);Destroy(lavenderOverlayRoot.gameObject);}
+        if(overlayCamera){overlayCamera.enabled=false;Destroy(overlayCamera.gameObject);}
+        if(lavenderMaterial)Destroy(lavenderMaterial);if(whiteGlowMaterial)Destroy(whiteGlowMaterial);
+        overlaySources.Clear();overlayProxies.Clear();overlayRenderers.Clear();BuildLavenderOverlay();
+    }
+
+    public void ConfigureReward(TubeRewardReveal owner){revealOwner=owner;}
+    public void ConfigureScene2(){scene2Object=true;}
+    public void ConfigureCrankReward(MusicBoxRewardLift owner){crankReward=owner;scene2Object=true;}
 
     public void SetForcedHighlight(bool enabled)
     {
@@ -76,6 +105,7 @@ public sealed class HoverScanHighlight : MonoBehaviour
 
     private void Update()
     {
+        if(!forcedHighlight&&!persistentHighlight&&(scene2Object||telescopingDevice||revealOwner))return;
         if (viewCamera == null) viewCamera = Camera.main != null ? Camera.main : FindObjectOfType<Camera>();
         hovered = false;
         if (lavenderOverlayRoot != null) lavenderOverlayRoot.gameObject.SetActive(false);
@@ -89,15 +119,100 @@ public sealed class HoverScanHighlight : MonoBehaviour
             if (lavenderOverlayRoot != null) lavenderOverlayRoot.gameObject.SetActive(hovered);
             return;
         }
+        if(persistentHighlight)
+        {
+            var renderer=visualRoot.GetComponentInChildren<Renderer>();
+            var origin=player?player.transform.position:viewCamera.transform.position;
+            if(!renderer||!renderer.enabled||Vector3.Distance(origin,renderer.bounds.ClosestPoint(origin))>hoverDistance)return;
+            if(lavenderMaterial){lavenderMaterial.SetColor("_RimColor",new Color(.7f,.35f,1,.7f));lavenderMaterial.SetFloat("_GlowIntensity",1.8f);}
+            hovered=TryGetScreenRect(out hoverRect);
+            if(lavenderOverlayRoot)lavenderOverlayRoot.gameObject.SetActive(hovered);
+            return;
+        }
 
-        Ray ray = viewCamera.ScreenPointToRay(Input.mousePosition);
-        if (!Physics.Raycast(ray, out RaycastHit hit, 100f, ~0, QueryTriggerInteraction.Collide)) return;
-        if (hit.transform != transform && !hit.transform.IsChildOf(transform)) return;
-        Transform distanceOrigin = player != null ? player.transform : viewCamera.transform;
-        if (Vector3.Distance(distanceOrigin.position, hit.collider.ClosestPoint(distanceOrigin.position)) > hoverDistance) return;
-        hovered = TryGetScreenRect(out hoverRect);
-        if (lavenderOverlayRoot != null) lavenderOverlayRoot.gameObject.SetActive(hovered);
+        RefreshPointerHover(viewCamera,Input.mousePosition);
     }
+
+    // Use the same real-view ray for runtime hover and interaction verification.
+    public bool RefreshPointerHover(Camera camera,Vector2 pointer)
+    {
+        if(!enabled||forcedHighlight||persistentHighlight||!camera)return false;
+        viewCamera=camera;hovered=false;
+        if(lavenderOverlayRoot)lavenderOverlayRoot.gameObject.SetActive(false);
+        SyncOverlayCamera();SyncOverlayVisuals();
+        Ray ray=viewCamera.ScreenPointToRay(pointer);
+        if(!Physics.Raycast(ray,out RaycastHit hit,100f,~((1<<30)|(1<<31)),QueryTriggerInteraction.Collide))return false;
+        if(hit.transform!=transform&&!hit.transform.IsChildOf(transform))return false;
+        Transform distanceOrigin=player?player.transform:viewCamera.transform;
+        if(Vector3.Distance(distanceOrigin.position,hit.collider.ClosestPoint(distanceOrigin.position))>hoverDistance)return false;
+        hovered=TryGetScreenRect(out hoverRect);
+        if(lavenderOverlayRoot)lavenderOverlayRoot.gameObject.SetActive(hovered);
+        return hovered;
+    }
+    private void LateUpdate()
+    {
+        if (telescopingDevice == null && revealOwner == null && !scene2Object) return;
+        var camera = viewCamera != null ? viewCamera : Camera.main;
+        Vector2 pointer = Cursor.lockState == CursorLockMode.Locked && camera != null
+            ? camera.pixelRect.center : (Vector2)Input.mousePosition;
+        RefreshDeviceHover(camera, pointer);
+    }
+
+    public bool RefreshDeviceHover(Camera camera, Vector2 pointer)
+    {
+        if(!enabled || forcedHighlight||persistentHighlight)return false;
+        hovered = false;
+        if (lavenderOverlayRoot != null) lavenderOverlayRoot.gameObject.SetActive(false);
+        if ((telescopingDevice == null && revealOwner == null && !scene2Object) || camera == null || !camera.pixelRect.Contains(pointer)) return false;
+        if(EvidenceInspect.BlocksWorldInput)return false;
+        if (revealOwner != null && !revealOwner.IsRevealed) return false;
+        if (crankReward != null && !crankReward.IsRaised) return false;
+        viewCamera = camera;
+        SyncOverlayVisuals();
+        var originalRenderer = visualRoot.GetComponent<Renderer>();
+        if (originalRenderer == null || !originalRenderer.enabled) return false;
+        SyncOverlayCamera();
+        Ray ray = camera.ScreenPointToRay(pointer);
+        ray.origin = camera.transform.position;
+        Physics.SyncTransforms();
+        if (telescopingDevice != null){
+            if (!telescopingDevice.CanInteract(ray, camera.transform.position, camera.farClipPlane)) return false;
+        } else {
+            Collider target=GetComponent<Collider>();
+            if(!target || !target.enabled)return false;
+            Vector3 closest=target is MeshCollider mesh && !mesh.convex
+                ? target.bounds.ClosestPoint(camera.transform.position) : target.ClosestPoint(camera.transform.position);
+            if(Vector3.Distance(camera.transform.position,closest)>hoverDistance+.001f)return false;
+            var hits=Physics.RaycastAll(ray,camera.farClipPlane,~0,QueryTriggerInteraction.Ignore);
+            System.Array.Sort(hits,(a,b)=>a.distance.CompareTo(b.distance));
+            bool hitReward=false;
+            foreach(var hit in hits){
+                if(player && hit.transform.IsChildOf(player.transform))continue;
+                hitReward=hit.transform==transform || hit.transform.IsChildOf(transform);
+                if(hitReward)break;
+                if(occlusionHousing && (hit.transform==occlusionHousing || hit.transform.IsChildOf(occlusionHousing)))continue;
+                break;
+            }
+            if(!hitReward)return false;
+        }
+        hovered = TryGetScreenRect(out hoverRect);
+        if (hovered)
+        {
+            // At close range the tall tube can extend beyond the Game view.
+            // Keep the selection frame within the visible viewport.
+            float margin=Mathf.Clamp(framePaddingPixels,4f,10f)*1.5f;
+            Rect viewport=camera.pixelRect;
+            float left=Mathf.Max(hoverRect.xMin,viewport.xMin+margin);
+            float right=Mathf.Min(hoverRect.xMax,viewport.xMax-margin);
+            float bottom=Mathf.Max(hoverRect.yMin,viewport.yMin+margin);
+            float top=Mathf.Min(hoverRect.yMax,viewport.yMax-margin);
+            hoverRect=Rect.MinMaxRect(left,bottom,right,top);
+            hovered=right>left && top>bottom;
+        }
+        if (lavenderOverlayRoot != null) lavenderOverlayRoot.gameObject.SetActive(hovered);
+        return hovered;
+    }
+
 
     private void OnGUI()
     {
@@ -210,10 +325,17 @@ public sealed class HoverScanHighlight : MonoBehaviour
 
     private bool TryGetScreenRect(out Rect result)
     {
-        Renderer[] renderers = visualRoot.GetComponentsInChildren<Renderer>(true);
-        if (renderers.Length == 0) { result = default; return false; }
-        Bounds bounds = renderers[0].bounds;
-        for (int i = 1; i < renderers.Length; i++) bounds.Encapsulate(renderers[i].bounds);
+        result=default;
+        if(!visualRoot||!visualRoot.gameObject.activeInHierarchy)return false;
+        bool hasVisibleSource=false;
+        Bounds bounds=default;
+        foreach(var renderer in visualRoot.GetComponentsInChildren<Renderer>(true))
+        {
+            if(!renderer||!renderer.enabled||!renderer.gameObject.activeInHierarchy||renderer.forceRenderingOff)continue;
+            if(!hasVisibleSource){bounds=renderer.bounds;hasVisibleSource=true;}
+            else bounds.Encapsulate(renderer.bounds);
+        }
+        if(!hasVisibleSource)return false;
         Vector3 min = bounds.min, max = bounds.max;
         Vector3[] corners =
         {

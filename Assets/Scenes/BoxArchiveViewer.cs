@@ -18,6 +18,7 @@ public sealed class BoxArchiveViewer : MonoBehaviour
     private Texture[] archiveTextures = new Texture[4];
     private bool[] rendererStates = new bool[4];
     private bool open;
+    private int selectedArchive=-1;
     private GUIStyle titleStyle;
     private GUIStyle closeStyle;
 
@@ -34,7 +35,14 @@ public sealed class BoxArchiveViewer : MonoBehaviour
         if (viewCamera == null) viewCamera = player != null ? player.PlayerCamera : Camera.main;
         if (open)
         {
-            if (Input.GetMouseButtonDown(0)) CloseArchiveViewer();
+            if(Input.GetKeyDown(KeyCode.Escape)){if(selectedArchive>=0)selectedArchive=-1;else CloseArchiveViewer();return;}
+            if(Input.GetMouseButtonDown(0))
+            {
+                if(selectedArchive>=0){selectedArchive=-1;return;}
+                Vector2 pointer=new Vector2(Input.mousePosition.x,Screen.height-Input.mousePosition.y);
+                for(int i=0;i<archiveTextures.Length;i++)if(ArchiveCardRect(i).Contains(pointer)&&archiveTextures[i]){selectedArchive=i;return;}
+                CloseArchiveViewer();
+            }
             return;
         }
         TryOpenArchiveViewer();
@@ -105,7 +113,7 @@ public sealed class BoxArchiveViewer : MonoBehaviour
     private void OpenArchiveViewer()
     {
         CacheArchives();
-        open = true;
+        open = true;selectedArchive=-1;
         for (int i = 0; i < archives.Length; i++)
         {
             if (archives[i] == null) continue;
@@ -137,33 +145,38 @@ public sealed class BoxArchiveViewer : MonoBehaviour
         GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
         GUI.color = Color.white;
         GUI.Label(new Rect(0, 25f, Screen.width, 28f), "PERSONAL CAPACITY ARCHIVE", titleStyle);
-        GUI.Label(new Rect(0, Screen.height - 48f, Screen.width, 22f), "CLICK ANYWHERE TO CLOSE", closeStyle);
+        GUI.Label(new Rect(0, Screen.height - 48f, Screen.width, 22f), selectedArchive>=0?"CLICK TO RETURN TO DOCUMENTS":"CLICK A DOCUMENT TO ENLARGE  /  CLICK OUTSIDE TO CLOSE", closeStyle);
 
-        float maxHeight = Mathf.Min(360f, Screen.height - 145f);
-        float gap = 22f;
-        float[] widths = new float[archiveTextures.Length];
-        float totalWidth = 0f;
-        for (int i = 0; i < archiveTextures.Length; i++)
+        if(selectedArchive>=0&&archiveTextures[selectedArchive])
         {
-            float aspect = archiveTextures[i] != null ? archiveTextures[i].width / (float)archiveTextures[i].height : .72f;
-            widths[i] = maxHeight * Mathf.Clamp(aspect, .45f, 1.15f);
-            totalWidth += widths[i];
+            var texture=archiveTextures[selectedArchive];
+            float aspect=texture.width/(float)texture.height;
+            float height=Mathf.Min(Screen.height-110f,(Screen.width-70f)/aspect);
+            var rect=new Rect((Screen.width-height*aspect)*.5f,(Screen.height-height)*.5f,height*aspect,height);
+            GUI.DrawTexture(rect,texture,ScaleMode.ScaleToFit,true);
+            return;
         }
-        totalWidth += gap * (archiveTextures.Length - 1);
-        float x = Mathf.Max(22f, (Screen.width - totalWidth) * .5f);
-        float y = (Screen.height - maxHeight) * .5f + 10f;
-        for (int i = 0; i < archiveTextures.Length; i++)
+        for(int i=0;i<archiveTextures.Length;i++)
         {
-            Rect card = new Rect(x, y, widths[i], maxHeight);
-            GUI.color = new Color(.68f, .28f, 1f, .9f);
-            GUI.DrawTexture(new Rect(card.x - 3f, card.y - 3f, card.width + 6f, card.height + 6f), Texture2D.whiteTexture);
-            GUI.color = Color.white;
-            if (archiveTextures[i] != null) GUI.DrawTexture(card, archiveTextures[i], ScaleMode.ScaleToFit, true);
-            else GUI.Label(card, "ARCHIVE\nUNAVAILABLE", titleStyle);
-            x += widths[i] + gap;
+            Rect card=ArchiveCardRect(i);
+            GUI.color=new Color(.68f,.28f,1f,.9f);
+            GUI.DrawTexture(new Rect(card.x-3,card.y-3,card.width+6,card.height+6),Texture2D.whiteTexture);
+            GUI.color=Color.white;
+            if(archiveTextures[i])GUI.DrawTexture(card,archiveTextures[i],ScaleMode.ScaleToFit,true);
+            else GUI.Label(card,"ARCHIVE\nUNAVAILABLE",titleStyle);
         }
     }
-
+    public Rect ArchiveCardRect(int index)
+    {
+        float gap=22f,totalAspect=0;
+        for(int i=0;i<archiveTextures.Length;i++)totalAspect+=ArchiveAspect(i);
+        float height=Mathf.Max(1,Mathf.Min(Screen.height-145f,(Screen.width-44f-gap*(archiveTextures.Length-1))/totalAspect));
+        float totalWidth=height*totalAspect+gap*(archiveTextures.Length-1);
+        float x=(Screen.width-totalWidth)*.5f;
+        for(int i=0;i<index;i++)x+=height*ArchiveAspect(i)+gap;
+        return new Rect(x,(Screen.height-height)*.5f+10f,height*ArchiveAspect(index),height);
+    }
+    private float ArchiveAspect(int index)=>archiveTextures[index]?archiveTextures[index].width/(float)archiveTextures[index].height:.72f;
     private void EnsureStyles()
     {
         if (titleStyle != null) return;

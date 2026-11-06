@@ -17,13 +17,13 @@ public sealed class DeskLampMemoryProjection : MonoBehaviour
     [Header("Ceiling memory image")]
     [SerializeField] private Transform ceilingProjectionAnchor;
     [SerializeField] private Texture2D memoryImage;
-    [SerializeField, Min(.1f)] private float projectionWidth = 7f;
+    [SerializeField, Min(.1f)] private float projectionWidth = 18f;
     [SerializeField, Range(0f, 1f)] private float projectionOpacity = .88f;
     [SerializeField, Min(0f)] private float idleJitter = .009f;
     [SerializeField] private Color imageTint = new Color(1f, .96f, .78f, 1f);
     [SerializeField, Range(0f, 1f)] private float paperLighten = .28f;
-    [SerializeField, Range(.001f, .3f)] private float edgeFeather = .08f;
-    [SerializeField, Range(.01f, .45f)] private float cornerRadius = .14f;
+    [SerializeField, Range(.001f, .3f)] private float edgeFeather = .18f;
+    [SerializeField, Range(.01f, .45f)] private float cornerRadius = .22f;
 
     private Camera viewCamera;
     private FirstPersonPlayer player;
@@ -50,17 +50,22 @@ public sealed class DeskLampMemoryProjection : MonoBehaviour
     {
         TryShowApproachLore();
         if (revealed) AnimateProjection();
-        if (!Input.GetMouseButtonDown(0) || revealed) return;
+        if (!Input.GetMouseButtonDown(0) || revealed || revealRoutine != null || EvidenceInspect.BlocksWorldInput) return;
         if (viewCamera == null) viewCamera = Camera.main != null ? Camera.main : FindObjectOfType<Camera>();
         if (viewCamera == null || clickCollider == null) return;
         if (Vector3.Distance(viewCamera.transform.position, clickCollider.ClosestPoint(viewCamera.transform.position)) > interactionDistance) return;
-
-        Ray ray = viewCamera.ScreenPointToRay(Input.mousePosition);
-        if (!Physics.Raycast(ray, out RaycastHit hit, rayDistance, ~0, QueryTriggerInteraction.Collide) ||
-            (hit.transform != transform && !hit.transform.IsChildOf(transform))) return;
-
-        BuildAtCeilingCentre();
-        if (revealRoutine == null) revealRoutine = StartCoroutine(RevealOnce());
+        Vector2 pointer = Cursor.lockState == CursorLockMode.Locked ? viewCamera.pixelRect.center : (Vector2)Input.mousePosition;
+        RaycastHit[] hits = Physics.RaycastAll(viewCamera.ScreenPointToRay(pointer), rayDistance, ~((1 << 30) | (1 << 31)), QueryTriggerInteraction.Collide);
+        System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+        bool lampClicked = false;
+        foreach (RaycastHit hit in hits)
+        {
+            if (hit.collider.GetComponentInParent<FirstPersonPlayer>() != null) continue;
+            lampClicked = hit.transform == transform || hit.transform.IsChildOf(transform);
+            break;
+        }
+        if (!lampClicked || !BuildAtCeilingCentre()) return;
+        revealRoutine = StartCoroutine(RevealOnce());
     }
 
     private void TryShowApproachLore()
@@ -104,14 +109,14 @@ public sealed class DeskLampMemoryProjection : MonoBehaviour
         clickCollider = box;
     }
 
-    private void BuildAtCeilingCentre()
+    private bool BuildAtCeilingCentre()
     {
-        if (projectionPlane != null) return;
+        if (projectionPlane != null) return true;
         GameObject ceiling = GameObject.Find("ceiling");
         if (ceiling == null || memoryImage == null)
         {
             Debug.LogError("[DeskLampMemory] Ceiling or CeilingMemoryProjection image is missing.", this);
-            return;
+            return false;
         }
 
         Renderer ceilingRenderer = ceiling.GetComponent<Renderer>();
@@ -122,8 +127,11 @@ public sealed class DeskLampMemoryProjection : MonoBehaviour
         {
             GameObject anchor = GameObject.Find("CeilingMemoryProjection") ?? new GameObject("CeilingMemoryProjection");
             ceilingProjectionAnchor = anchor.transform;
-            ceilingProjectionAnchor.SetParent(ceiling.transform, true);
+
         }
+        // Keep the runtime projection in world units; a rotated, non-uniform ceiling otherwise distorts it.
+        ceilingProjectionAnchor.SetParent(null, true);
+        ceilingProjectionAnchor.localScale = Vector3.one;
         // Bounds centre is world-space: this remains the visible centre despite ceiling scale/rotation.
         ceilingProjectionAnchor.SetPositionAndRotation(centre + normal * .025f, Quaternion.LookRotation(normal, Vector3.forward));
 
@@ -146,13 +154,14 @@ public sealed class DeskLampMemoryProjection : MonoBehaviour
         projectionBasePosition = projectionPlane.localPosition;
         float height = projectionWidth * memoryImage.height / memoryImage.width;
         projectionPlane.localScale = new Vector3(projectionWidth, height, 1f);
-        Shader projectionShader = Shader.Find("Custom/CeilingMemoryProjection");
+        Material template = Resources.Load<Material>("CeilingMemoryProjectionMaterial");
+        Shader projectionShader = template != null ? template.shader : Shader.Find("Custom/CeilingMemoryProjection");
         if (projectionShader == null)
         {
             Debug.LogError("[DeskLampMemory] Ceiling projection shader is missing.", this);
             Destroy(imagePlane);
             projectionPlane = null;
-            return;
+            return false;
         }
         projectionMaterial = new Material(projectionShader);
         projectionMaterial.mainTexture = memoryImage;
@@ -164,6 +173,7 @@ public sealed class DeskLampMemoryProjection : MonoBehaviour
         imagePlane.GetComponent<MeshRenderer>().sharedMaterial = projectionMaterial;
         projectionPlane.gameObject.SetActive(false);
         Debug.Log($"[DeskLampMemory] Image built at ceiling centre {centre}.", this);
+        return true;
     }
 
     private IEnumerator RevealOnce()
@@ -205,3 +215,6 @@ public sealed class DeskLampMemoryProjection : MonoBehaviour
         if (projectionMaterial != null) Destroy(projectionMaterial);
     }
 }
+
+
+

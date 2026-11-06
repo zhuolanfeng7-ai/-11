@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 #if UNITY_EDITOR
@@ -96,7 +96,7 @@ public sealed class GlassPuzzleController : MonoBehaviour
 
         if (inventoryEntry != null)
         {
-            inventoryEntry.SetActive(true);
+            inventoryEntry.SetActive(false);
             RawImage icon = inventoryEntry.GetComponentInChildren<RawImage>(true);
             if (icon != null)
             {
@@ -116,20 +116,27 @@ public sealed class GlassPuzzleController : MonoBehaviour
         }
 
         ValidateSetup();
+        if(Application.isPlaying&&glassTarget)
+        {
+            var hover=glassTarget.GetComponent<HoverScanHighlight>();
+            if(!hover)hover=glassTarget.gameObject.AddComponent<HoverScanHighlight>();
+            hover.enabled=true;hover.SetForcedHighlight(false);
+            hover.Configure(6,interactionDistance);hover.ConfigureViewCamera(interactionCamera);
+        }
         Log($"Ready. Visual='{NameOf(glassTarget)}', collider='{NameOf(pickupCollider)}' (enabled={pickupCollider != null && pickupCollider.enabled}, trigger={pickupCollider != null && pickupCollider.isTrigger}), camera='{NameOf(interactionCamera)}', blur={(blurEffect != null)}, player='{NameOf(player)}'.");
     }
 
     private void Update()
     {
-        if (!Input.GetMouseButtonDown(0))
-        {
-            return;
-        }
-
+        if(Application.isPlaying&&Input.GetMouseButtonDown(0))TryPickup(Input.mousePosition);
+    }
+    public bool TryPickup(Vector2 pointer)
+    {
+        if(Scene2PickupPresentation.IsPlaying)return false;
         if (solved)
         {
             Log("Click ignored: this GlassPuzzle was already picked up.");
-            return;
+            return false;
         }
 
         if (player == null || interactionCamera == null || blurEffect == null || pickupCollider == null)
@@ -139,7 +146,7 @@ public sealed class GlassPuzzleController : MonoBehaviour
                 (interactionCamera == null ? "Camera " : string.Empty) +
                 (blurEffect == null ? "VisionBlurEffect " : string.Empty) +
                 (pickupCollider == null ? "Collider" : string.Empty));
-            return;
+            return false;
         }
 
         Vector3 closestPoint = pickupCollider.ClosestPoint(player.position);
@@ -147,21 +154,21 @@ public sealed class GlassPuzzleController : MonoBehaviour
         if (distance > interactionDistance)
         {
             Log($"Click blocked: player is {distance:F2} units away; allowed distance is {interactionDistance:F2}.");
-            return;
+            return false;
         }
 
-        Ray ray = interactionCamera.ScreenPointToRay(Input.mousePosition);
+        Ray ray = interactionCamera.ScreenPointToRay(pointer);
         if (!Physics.Raycast(ray, out RaycastHit hit, clickRayDistance, ~0, QueryTriggerInteraction.Collide))
         {
             Log("Click blocked: raycast hit nothing. Check that the Collider is enabled and that the mouse is over the glasses.");
-            return;
+            return false;
         }
 
         bool hitPickupCollider = hit.collider == pickupCollider || hit.collider.transform.IsChildOf(pickupCollider.transform);
         if (!hitPickupCollider)
         {
             Log($"Click blocked: ray hit '{NameOf(hit.collider)}' instead of the glasses collider '{NameOf(pickupCollider)}'.");
-            return;
+            return false;
         }
 
         solved = true;
@@ -170,10 +177,22 @@ public sealed class GlassPuzzleController : MonoBehaviour
         pickupCollider.enabled = false;
         StartCoroutine(ClearVision());
         StartCoroutine(PlayPickupPresentation());
+        return true;
     }
 
     private IEnumerator PlayPickupPresentation()
     {
+        var mesh=glassTarget?glassTarget.GetComponentInChildren<MeshFilter>(true):null;
+        if(mesh&&Scene2PickupPresentation.BeginScene1Glasses(mesh,mesh.GetComponent<Renderer>()))
+        {
+            foreach(var hover in glassTarget.GetComponentsInChildren<HoverScanHighlight>(true))hover.enabled=false;
+            glassTarget.gameObject.SetActive(false);
+            if(inventoryEntry)inventoryEntry.SetActive(false);
+            if(glowBackdrop)glowBackdrop.SetActive(false);
+            while(Scene2PickupPresentation.IsPlaying)yield return null;
+            ShowVisualLore();
+            yield break;
+        }
         if (glassTarget == null || presentationAnchor == null)
         {
             Debug.LogError("GlassPuzzle: presentation cannot start because Glass Target or Presentation Anchor is missing.", this);

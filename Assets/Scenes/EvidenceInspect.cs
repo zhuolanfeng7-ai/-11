@@ -16,7 +16,7 @@ public sealed class EvidenceInspect : MonoBehaviour
     private bool playerWasEnabled;
     private CursorLockMode previousCursor;
     public bool IsOpen => active==this;
-    public static bool BlocksWorldInput => Scene2RepairCelebration.IsPlaying || active!=null || consumedFrame==Time.frameCount || Scene2PlateInstallation.BlocksWorldInput || Scene2WorldIntroduction.BlocksWorldInput || Scene2PickupPresentation.IsPlaying;
+    public static bool BlocksWorldInput => Scene3SignatureForm.BlocksWorldInput || Scene3HumanDialogue.BlocksWorldInput || Scene2RepairCelebration.IsPlaying || active!=null || consumedFrame==Time.frameCount || Scene2PlateInstallation.BlocksWorldInput || Scene2WorldIntroduction.BlocksWorldInput || Scene2PickupPresentation.IsPlaying;
     public Texture DisplayTexture => evidenceTexture;
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetState(){active=null;consumedFrame=-1;}
@@ -67,3 +67,5 @@ public sealed class EvidenceInspect : MonoBehaviour
     }
     private void OnDisable(){CloseInspection();}
 }
+
+

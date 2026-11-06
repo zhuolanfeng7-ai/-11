@@ -95,6 +95,7 @@ public sealed class FamilyPiecePuzzleController : MonoBehaviour
 
     private void TryOpenPuzzle()
     {
+        if(everCompleted)return;
         if (Scene2PickupPresentation.IsPlaying || !Input.GetMouseButtonDown(0) || viewCamera == null) return;
         if (worldPiece == null) FindWorldPiece();
         if (worldPiece == null || sourceTexture == null || interactionCollider == null) return;
@@ -202,6 +203,12 @@ public sealed class FamilyPiecePuzzleController : MonoBehaviour
         while(Scene2PickupPresentation.IsPlaying)yield return null;
         Scene2PickupPresentation.BeginScene1Piece(sourceTexture);
         ClosePuzzle();
+        if(worldPiece)
+        {
+            foreach(var hover in worldPiece.GetComponentsInChildren<HoverScanHighlight>(true))hover.enabled=false;
+            foreach(var renderer in worldPiece.GetComponentsInChildren<Renderer>(true))renderer.enabled=false;
+            foreach(var collider in worldPiece.GetComponentsInChildren<Collider>(true))collider.enabled=false;
+        }
     }
 
     private void RestoreWorldColor()
@@ -238,7 +245,7 @@ public sealed class FamilyPiecePuzzleController : MonoBehaviour
     private void ClosePuzzle()
     {
         open = false;
-        if (pieceHoverHighlight != null) pieceHoverHighlight.enabled = true;
+        if (pieceHoverHighlight != null) pieceHoverHighlight.enabled = !everCompleted;
         if (completionLorePending && !completionLoreShown)
         {
             completionLorePending = false;

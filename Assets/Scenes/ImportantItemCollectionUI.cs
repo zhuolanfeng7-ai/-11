@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 /// <summary>Right-side archive showing the important items collected by the player.</summary>
 public sealed class ImportantItemCollectionUI : MonoBehaviour
@@ -9,8 +9,12 @@ public sealed class ImportantItemCollectionUI : MonoBehaviour
     private Texture2D alloyIcon;
     private Texture2D scene1GlassesIcon;
     private Texture2D scene1PieceIcon;
-    public bool StoreScene1Piece(Texture2D icon){if(IsScene2||!icon||scene1PieceIcon)return false;scene1PieceIcon=icon;flashUntil[1]=Time.unscaledTime+1.2f;return true;}
-    public bool StoreScene1Glasses(Texture2D icon){if(IsScene2||!icon||scene1GlassesIcon)return false;scene1GlassesIcon=icon;flashUntil[0]=Time.unscaledTime+1.2f;return true;}
+    private Texture2D scene1FilmIcon;
+    private Texture2D scene1SketchIcon;
+    public bool StoreScene1Sketch(Texture2D icon){if(IsScene2||!icon||scene1SketchIcon)return false;scene1SketchIcon=icon;flashUntil[3]=Time.unscaledTime+1.2f;Scene1InventoryCanvasBridge.Refresh();return true;}
+    public bool StoreScene1Film(Texture2D icon){if(IsScene2||!icon||scene1FilmIcon)return false;scene1FilmIcon=icon;flashUntil[2]=Time.unscaledTime+1.2f;Scene1InventoryCanvasBridge.Refresh();return true;}
+    public bool StoreScene1Piece(Texture2D icon){if(IsScene2||!icon||scene1PieceIcon)return false;scene1PieceIcon=icon;flashUntil[1]=Time.unscaledTime+1.2f;Scene1InventoryCanvasBridge.Refresh();return true;}
+    public bool StoreScene1Glasses(Texture2D icon){if(IsScene2||!icon||scene1GlassesIcon)return false;scene1GlassesIcon=icon;flashUntil[0]=Time.unscaledTime+1.2f;Scene1InventoryCanvasBridge.Refresh();return true;}
     private Texture2D alloy2Icon;
     private bool hasCp1;
     private bool hasScene2Key;
@@ -42,8 +46,8 @@ public sealed class ImportantItemCollectionUI : MonoBehaviour
     public int VisibleSlotCount=>4;
     // Keep existing saved pickup item IDs; only the four repair parts have UI slots.
     public static int DisplaySlotForItem(int item){return item==0?0:item==1?1:item==4?2:item==5?3:-1;}
-    public Texture2D VisibleIcon(int index){if(!IsScene2)return index==0?scene1GlassesIcon:index==1?scene1PieceIcon:null;return index==0?alloyIcon:index==1?alloy2Icon:index==2?nailIcon:index==3?tapeIcon:null;}
-    public Rect SlotScreenRect(int index){if(index<0||index>=VisibleSlotCount)return Rect.zero;float scale=Mathf.Clamp(Screen.height/900f,.75f,1.15f),size=58*scale,gap=12*scale;int count=VisibleSlotCount;float top=(Screen.height-(count*size+(count-1)*gap))*.5f+index*(size+gap);return new Rect(Screen.width-size-22*scale,Screen.height-top-size,size,size);}
+    public Texture2D VisibleIcon(int index){if(!IsScene2)return index==0?scene1GlassesIcon:index==1?scene1PieceIcon:index==2?scene1FilmIcon:index==3?scene1SketchIcon:null;return index==0?alloyIcon:index==1?alloy2Icon:index==2?nailIcon:index==3?tapeIcon:null;}
+    public Rect SlotScreenRect(int index){if(index<0||index>=VisibleSlotCount)return Rect.zero;if(!IsScene2){var slot=Scene1InventoryCanvasBridge.ScreenSlot(index);if(slot.width>0)return slot;}float scale=Mathf.Clamp(Screen.height/900f,.75f,1.15f),size=58*scale,gap=12*scale;int count=VisibleSlotCount;float top=(Screen.height-(count*size+(count-1)*gap))*.5f+index*(size+gap);return new Rect(Screen.width-size-22*scale,Screen.height-top-size,size,size);}
 
     private bool IsScene2 => string.Equals(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name.Replace(" ",""),"scene2",System.StringComparison.OrdinalIgnoreCase);
     public bool StoreAlloy(Texture2D icon){return StoreAlloyInSlot(0,icon);}
@@ -74,6 +78,7 @@ public sealed class ImportantItemCollectionUI : MonoBehaviour
     private void Awake()
     {
         CacheReferences();
+        if(!IsScene2&&!GetComponent<Scene1InventoryCanvasBridge>())gameObject.AddComponent<Scene1InventoryCanvasBridge>();
         bool[] state = ReadState();
         for (int i = 0; i < state.Length; i++) previousState[i] = state[i];
     }
@@ -106,8 +111,8 @@ public sealed class ImportantItemCollectionUI : MonoBehaviour
         {
             scene1GlassesIcon!=null,
             scene1PieceIcon!=null,
-            IsScene2 ? HasCp1 : pictureSketch != null && pictureSketch.IsCollected,
-            IsScene2 ? HasScene2Key : KeyPickupHandler.HasCollected
+            scene1FilmIcon!=null,
+            scene1SketchIcon!=null
         };
     }
 

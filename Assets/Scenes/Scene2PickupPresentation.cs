@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -29,9 +29,17 @@ public sealed class Scene2PickupPresentation : MonoBehaviour
     private Material rimMaterial;
     private float presentationTime;
     private bool running,committed;
-    private bool scene1Glasses,scene1Piece;
-    public const string GlassesIdentifier="A-211";
+    private bool scene1Glasses,scene1Piece,scene1Film,scene1Sketch;
+    public const string GlassesIdentifier="A-21";
     public const string PieceIdentifier="A-666";
+    public const string FilmIdentifier="A-623";
+    public const string SketchIdentifier="A-98";
+    private Texture sketchBackTexture;
+    private int sketchOpenedFrame;
+    private bool sketchBack,sketchReturning,sketchReview;
+    private float sketchBackElapsed;
+    public bool ShowingSketchBack=>scene1Sketch&&sketchBack;
+    public bool WaitingForSketchFlip=>scene1Sketch&&!sketchBack&&!sketchReturning&&Elapsed>=FlightStarts-.002f;
     public float Elapsed=>presentationTime;
     public int PulseCount=>Mathf.Clamp(Mathf.FloorToInt((Elapsed-AppearSeconds)/PulseSeconds)+1,0,3);
     public RenderTexture ModelTexture=>modelTexture;
@@ -44,7 +52,7 @@ public sealed class Scene2PickupPresentation : MonoBehaviour
         if(IsPlaying||!source||!source.sharedMesh||!renderer||!source.gameObject.scene.name.Replace(" ","").Equals("scene1",System.StringComparison.OrdinalIgnoreCase))return false;
         var ui=FindObjectOfType<ImportantItemCollectionUI>();if(!ui)ui=new GameObject("Important Item Collection UI").AddComponent<ImportantItemCollectionUI>();
         if(ui.VisibleIcon(0))return false;
-        var owner=new GameObject("Scene1 A-211 Glasses Pickup Presentation");SceneManager.MoveGameObjectToScene(owner,source.gameObject.scene);
+        var owner=new GameObject("Scene1 A-21 Glasses Pickup Presentation");SceneManager.MoveGameObjectToScene(owner,source.gameObject.scene);
         var effect=owner.AddComponent<Scene2PickupPresentation>();effect.scene1Glasses=true;effect.itemId=211;effect.displaySlot=0;effect.inventory=ui;effect.itemSource=source;effect.BuildPreview(source,renderer);
         var target=RenderTexture.GetTemporary(160,90,0,RenderTextureFormat.ARGB32);var previous=RenderTexture.active;
         Graphics.Blit(effect.modelTexture,target);RenderTexture.active=target;effect.icon=new Texture2D(160,90,TextureFormat.RGBA32,false);effect.icon.ReadPixels(new Rect(0,0,160,90),0,0);effect.icon.Apply();RenderTexture.active=previous;RenderTexture.ReleaseTemporary(target);
@@ -71,6 +79,39 @@ public sealed class Scene2PickupPresentation : MonoBehaviour
         var target=RenderTexture.GetTemporary(160,90,0,RenderTextureFormat.ARGB32);var previous=RenderTexture.active;
         Graphics.Blit(effect.modelTexture,target);RenderTexture.active=target;effect.icon=new Texture2D(160,90,TextureFormat.RGBA32,false);effect.icon.ReadPixels(new Rect(0,0,160,90),0,0);effect.icon.Apply();RenderTexture.active=previous;RenderTexture.ReleaseTemporary(target);
         effect.running=true;current=effect;return true;
+    }
+    public static bool BeginScene1Sketch(Texture portrait,Texture back=null,bool review=false)
+    {
+        if(IsPlaying||!portrait||!SceneManager.GetActiveScene().name.Replace(" ","").Equals("scene1",System.StringComparison.OrdinalIgnoreCase))return false;
+        var ui=FindObjectOfType<ImportantItemCollectionUI>();if(!ui)ui=new GameObject("Important Item Collection UI").AddComponent<ImportantItemCollectionUI>();
+        if(ui.VisibleIcon(3)&&!review)return false;
+        var owner=new GameObject("Scene1 A-98 Sketch Pickup Presentation");
+        var effect=owner.AddComponent<Scene2PickupPresentation>();effect.scene1Sketch=true;effect.sketchBackTexture=back?back:portrait;effect.sketchReview=review;effect.sketchOpenedFrame=Time.frameCount;effect.itemId=98;effect.displaySlot=3;effect.inventory=ui;
+        var quad=GameObject.CreatePrimitive(PrimitiveType.Quad);
+        effect.BuildPreview(quad.GetComponent<MeshFilter>(),quad.GetComponent<Renderer>());Destroy(quad);
+        var material=new Material(Shader.Find("Unlit/Texture")){mainTexture=portrait};effect.materials.Add(material);
+        effect.model.GetComponent<Renderer>().sharedMaterial=material;
+        float aspect=portrait.width/(float)portrait.height;
+        float height=Mathf.Min(2.35f,4.4f/aspect);
+        effect.model.rotation=Quaternion.identity;effect.model.position=effect.origin;effect.model.localScale=new Vector3(height*aspect,height,1);
+        // Fill more of the showcase while keeping the complete portrait visible.
+        effect.previewCamera.orthographicSize=1.25f;
+        if(effect.rimMaterial)effect.rimMaterial.SetFloat("_Strength",0);
+        effect.previewCamera.Render();
+        var target=RenderTexture.GetTemporary(160,90,0,RenderTextureFormat.ARGB32);var previous=RenderTexture.active;
+        Graphics.Blit(effect.modelTexture,target);RenderTexture.active=target;effect.icon=new Texture2D(160,90,TextureFormat.RGBA32,false);effect.icon.ReadPixels(new Rect(0,0,160,90),0,0);effect.icon.Apply();RenderTexture.active=previous;RenderTexture.ReleaseTemporary(target);
+        if(review)effect.presentationTime=FlightStarts-.001f;effect.running=true;current=effect;return true;
+    }
+    public static bool BeginScene1Film(MeshFilter source,Renderer renderer)
+    {
+        if(IsPlaying||!source||!source.sharedMesh||!renderer||!source.gameObject.scene.name.Replace(" ","").Equals("scene1",System.StringComparison.OrdinalIgnoreCase))return false;
+        var ui=FindObjectOfType<ImportantItemCollectionUI>();if(!ui)ui=new GameObject("Important Item Collection UI").AddComponent<ImportantItemCollectionUI>();
+        if(ui.VisibleIcon(2))return false;
+        var owner=new GameObject("Scene1 Film Pickup Flight");var effect=owner.AddComponent<Scene2PickupPresentation>();
+        effect.scene1Film=true;effect.itemId=212;effect.displaySlot=2;effect.inventory=ui;effect.BuildPreview(source,renderer);
+        var target=RenderTexture.GetTemporary(160,90,0,RenderTextureFormat.ARGB32);var previous=RenderTexture.active;
+        Graphics.Blit(effect.modelTexture,target);RenderTexture.active=target;effect.icon=new Texture2D(160,90,TextureFormat.RGBA32,false);effect.icon.ReadPixels(new Rect(0,0,160,90),0,0);effect.icon.Apply();RenderTexture.active=previous;RenderTexture.ReleaseTemporary(target);
+        effect.presentationTime=0;effect.running=true;current=effect;return true;
     }
     public static bool Begin(MeshFilter source,Renderer renderer,ImportantItemCollectionUI ui,Texture2D itemIcon,int item=0)
     {
@@ -107,6 +148,7 @@ public sealed class Scene2PickupPresentation : MonoBehaviour
             material.color=scene1Glasses?new Color(1,.84f,.38f):itemId==5?new Color(.85f,.83f,.84f):new Color(.72f,.76f,.86f);
             if(material.HasProperty("_TextureWeight"))material.SetFloat("_TextureWeight",scene1Glasses?1:itemId==5?.92f:.16f);
             if(scene1Glasses&&material.HasProperty("_Gold"))material.SetFloat("_Gold",1);
+            if(scene1Film){Destroy(material);material=new Material(Shader.Find("Unlit/Texture"));if(original)material.mainTexture=original.mainTexture;}
             materials.Add(material);assigned[i]=material;
         }
         renderer.sharedMaterials=assigned;renderer.shadowCastingMode=UnityEngine.Rendering.ShadowCastingMode.Off;
@@ -195,15 +237,41 @@ public sealed class Scene2PickupPresentation : MonoBehaviour
         }
         return new Rect(center.x-size/2,center.y-size*9/32,size,size*9/16);
     }
+    private void Update()
+    {
+        if(Time.frameCount>sketchOpenedFrame&&WaitingForSketchFlip&&Input.GetMouseButtonDown(0))FlipSketch();
+    }
+    public bool FlipSketch()
+    {
+        if(!WaitingForSketchFlip)return false;
+        sketchBack=true;sketchBackElapsed=0;
+        var material=model.GetComponent<Renderer>().sharedMaterial;
+        material.mainTexture=sketchBackTexture;
+        float aspect=sketchBackTexture.width/(float)sketchBackTexture.height;
+        float height=Mathf.Min(2.35f,4.4f/aspect);
+        model.localScale=new Vector3(height*aspect,height,1);
+        previewCamera.Render();
+        return true;
+    }
     private void LateUpdate()
     {
         if(!running)return;
         // A shader-loading hitch must not skip an entire pickup flash.
-        presentationTime+=Mathf.Min(Time.unscaledDeltaTime,.1f);
+        float delta=Mathf.Min(Time.unscaledDeltaTime,.1f);
+        if(scene1Sketch&&!sketchReturning)
+        {
+            presentationTime=Mathf.Min(presentationTime+delta,FlightStarts-.001f);
+            if(sketchBack)
+            {
+                sketchBackElapsed+=delta;
+                if(sketchBackElapsed>=3f){sketchReturning=true;presentationTime=FlightStarts;}
+            }
+        }
+        else presentationTime+=delta;
         if(Elapsed>=Duration){Complete();return;}
         float pulse=PulseAt(Elapsed);
         foreach(var material in materials)if(material.HasProperty("_Pulse"))material.SetFloat("_Pulse",pulse);
-        if(rimMaterial)rimMaterial.SetFloat("_Strength",scene1Piece?0:scene1Glasses?.08f+pulse*.3f:.55f+pulse*1.6f);
+        if(rimMaterial)rimMaterial.SetFloat("_Strength",(scene1Piece||scene1Sketch)?0:scene1Glasses?.08f+pulse*.3f:.55f+pulse*1.6f);
         previewCamera.Render();
     }
     private void DrawOverlay(System.Action<Rect,Texture,Color> draw)
@@ -215,7 +283,7 @@ public sealed class Scene2PickupPresentation : MonoBehaviour
         var glow=new Rect(center.x-rect.width*.53f,center.y-rect.height*.43f,rect.width*1.06f,rect.height*.86f);
         draw(glow,halo,new Color(.48f,.18f,1,(.24f+pulse*.42f)*appear*(1-flight)));
         draw(new Rect(glow.x+glow.width*.12f,glow.y,glow.width*.76f,glow.height),halo,new Color(.23f,.66f,1,(.15f+pulse*.25f)*appear*(1-flight)));
-        float fade=(scene1Glasses||scene1Piece)&&time>=AppearSeconds&&time<AppearSeconds+3*PulseSeconds?.18f+.82f*pulse:1;
+        float fade=(scene1Glasses||scene1Piece||scene1Film||scene1Sketch)&&time>=AppearSeconds&&time<AppearSeconds+3*PulseSeconds?.18f+.82f*pulse:1;
         draw(rect,modelTexture,new Color(1,1,1,appear*fade));
         for(int i=0;i<16;i++)
         {
@@ -233,6 +301,8 @@ public sealed class Scene2PickupPresentation : MonoBehaviour
         {
             case 211:return GlassesIdentifier;
             case 666:return PieceIdentifier;
+            case 212:return FilmIdentifier;
+            case 98:return SketchIdentifier;
             case 0:return "A-012";  // alloy1
             case 1:return "A-009";  // alloy2
             case 4:return "AB-077"; // nail
@@ -288,7 +358,7 @@ public sealed class Scene2PickupPresentation : MonoBehaviour
         committed=true;running=false;
         if(icon)
         {
-            if(inventory&&(scene1Piece?inventory.StoreScene1Piece(icon):scene1Glasses?inventory.StoreScene1Glasses(icon):inventory.StoreAlloyInSlot(itemId,icon)))
+            if(inventory&&((scene1Sketch&&sketchReview&&inventory.VisibleIcon(3))?false:scene1Sketch?inventory.StoreScene1Sketch(icon):scene1Film?inventory.StoreScene1Film(icon):scene1Piece?inventory.StoreScene1Piece(icon):scene1Glasses?inventory.StoreScene1Glasses(icon):inventory.StoreAlloyInSlot(itemId,icon)))
             {
                 if(itemId==5)inventory.RecordTapeSource(itemSource);
                 icon=null;

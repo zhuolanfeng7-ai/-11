@@ -16,11 +16,14 @@ public sealed class PurpleBoxUnlockController : MonoBehaviour
     private FirstPersonPlayer player;
     private bool unlocking;
     private bool unlocked;
+    public bool IsUnlocked=>unlocked;
+    public int UnlockedFrame{get;private set;}=-1;
 
     private void Awake()
     {
         player = FindObjectOfType<FirstPersonPlayer>();
         viewCamera = player != null ? player.PlayerCamera : Camera.main;
+        if(!GetComponent<PurpleBoxKeyGuidance>())gameObject.AddComponent<PurpleBoxKeyGuidance>();
     }
 
     private void Update()
@@ -227,8 +230,10 @@ public sealed class PurpleBoxUnlockController : MonoBehaviour
             yield return null;
         }
 
+        var guidance=GetComponent<PurpleBoxKeyGuidance>();if(guidance)guidance.Finish();
         yield return OpenPurpleLid();
         unlocked = true;
+        UnlockedFrame=Time.frameCount;
         Debug.Log("[PurpleBox] Unlock animation complete.");
         Destroy(key);
     }

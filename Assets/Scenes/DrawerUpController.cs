@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// Toggles drawerUp when its Handrail Up child collider is clicked.
+/// Toggles drawerUp from its handle, drawer body, or repaired front panel.
 /// This component belongs on the drawerUp parent, never on the replaceable handle art.
 /// </summary>
 public sealed class DrawerUpController : MonoBehaviour
@@ -29,6 +29,11 @@ public sealed class DrawerUpController : MonoBehaviour
     private void Awake()
     {
         DrawerUpShellRepair.Ensure(transform);
+        if(!GetComponent<Collider>())
+        {
+            var mesh=GetComponent<MeshFilter>();
+            if(mesh&&mesh.sharedMesh)gameObject.AddComponent<MeshCollider>().sharedMesh=mesh.sharedMesh;
+        }
         closedLocalPosition = transform.localPosition;
 
         if (interactionCamera == null)
@@ -43,32 +48,36 @@ public sealed class DrawerUpController : MonoBehaviour
                 handrailCollider = handle.GetComponent<Collider>();
         }
 
-        if (handrailCollider == null)
-            Debug.LogError("drawerUp: Handrail Up Collider is missing.", this);
     }
 
     private void Update()
     {
-        if (moving || handrailCollider == null ||
+        if (moving ||
             interactionCamera == null || player == null || !Input.GetMouseButtonDown(0))
         {
             return;
         }
 
-        Vector3 closestPoint = handrailCollider.ClosestPoint(player.transform.position);
-        if (Vector3.Distance(player.transform.position, closestPoint) > interactionDistance)
-        {
-            return;
-        }
-
         Ray ray = interactionCamera.ScreenPointToRay(Input.mousePosition);
-        if (!Physics.Raycast(ray, out RaycastHit hit, clickRayDistance, ~0, QueryTriggerInteraction.Ignore) ||
-            hit.collider != handrailCollider)
+        TryInteract(ray);
+    }
+
+    public bool TryInteract(Ray ray)
+    {
+        if(moving||!player)return false;
+        if (!Physics.Raycast(ray, out RaycastHit hit, clickRayDistance, ~0, QueryTriggerInteraction.Ignore))return false;
+        bool handle=hit.collider==handrailCollider;
+        bool drawer=hit.transform==transform;
+        bool front=hit.transform.IsChildOf(transform)&&hit.transform.name=="Front Inner Panel";
+        if(!handle&&!drawer&&!front)return false;
+        Vector3 closestPoint=hit.collider is MeshCollider mesh&&!mesh.convex?hit.collider.bounds.ClosestPoint(player.transform.position):hit.collider.ClosestPoint(player.transform.position);
+        if(Vector3.Distance(player.transform.position,closestPoint)>interactionDistance)
         {
-            return;
+            return false;
         }
 
         StartCoroutine(MoveDrawer(!opened));
+        return true;
     }
 
     private IEnumerator MoveDrawer(bool open)

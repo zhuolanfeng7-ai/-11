@@ -6,8 +6,8 @@ Shader "Custom/CeilingMemoryProjection"
         _Tint ("Pale Warm Tint", Color) = (1, 0.96, 0.78, 1)
         _Opacity ("Projection Opacity", Range(0,1)) = 0
         _Lighten ("Paper Lighten", Range(0,1)) = 0.28
-        _Feather ("Edge Feather", Range(0.001,0.3)) = 0.08
-        _CornerRadius ("Corner Radius", Range(0.01,0.45)) = 0.14
+        _Feather ("Edge Feather", Range(0.001,0.3)) = 0.18
+        _CornerRadius ("Corner Radius", Range(0.01,0.45)) = 0.22
     }
     SubShader
     {
@@ -35,10 +35,12 @@ Shader "Custom/CeilingMemoryProjection"
                 float vignette = 1 - smoothstep(.34, .72, length((i.uv - .5) * float2(1.15, 1)));
                 fixed4 image = tex2D(_MainTex, i.uv);
                 float3 paleImage = lerp(image.rgb, 1, _Lighten) * _Tint.rgb;
-                float edgeShade = lerp(.58, 1, vignette);
-                return fixed4(paleImage * edgeShade, image.a * roundedMask * _Opacity);
+                // Fade coverage instead of darkening the paper into a visible border.
+                float edgeCoverage = smoothstep(0, 1, roundedMask) * lerp(.75, 1, vignette);
+                return fixed4(paleImage, image.a * edgeCoverage * _Opacity);
             }
             ENDCG
         }
     }
 }
+
