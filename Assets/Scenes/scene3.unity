@@ -2668,6 +2668,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: gezi4
       objectReference: {fileID: 0}
+    - target: {fileID: 730389239196920136, guid: ead5db895e1b6604b84e1d2836b0acac, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.000931
+      objectReference: {fileID: 0}
+    - target: {fileID: 730389239196920136, guid: ead5db895e1b6604b84e1d2836b0acac, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.000105
+      objectReference: {fileID: 0}
     - target: {fileID: 756146898021855158, guid: ead5db895e1b6604b84e1d2836b0acac, type: 3}
       propertyPath: m_CastShadows
       value: 2
