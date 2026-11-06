@@ -31,7 +31,7 @@ public class DoorCodePuzzleController : MonoBehaviour
     private string feedback = "";
     private float feedbackUntil;
     private bool openingOrOpen;
-    private float transitionWhiteAlpha;
+    private float transitionBlackAlpha;
     private GUIStyle titleStyle;
     private GUIStyle codeStyle;
     private GUIStyle buttonStyle;
@@ -43,6 +43,8 @@ public class DoorCodePuzzleController : MonoBehaviour
         // inspector serialization from a previous scene reload.
         correctCode = "20040214";
         codeLength = 8;
+        nextSceneName = "scene 2";
+        transitionFadeSeconds = 2f;
         FindDoor();
         SuppressAccidentalPickupBehaviour();
     }
@@ -278,11 +280,10 @@ public class DoorCodePuzzleController : MonoBehaviour
         while (elapsed < transitionFadeSeconds)
         {
             elapsed += Time.unscaledDeltaTime;
-            transitionWhiteAlpha = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(elapsed / transitionFadeSeconds));
+            transitionBlackAlpha = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(elapsed / transitionFadeSeconds));
             yield return null;
         }
-        transitionWhiteAlpha = 1f;
-        yield return new WaitForSecondsRealtime(.35f);
+        transitionBlackAlpha = 1f;
         if (!string.IsNullOrWhiteSpace(nextSceneName) && Application.CanStreamedLevelBeLoaded(nextSceneName))
             SceneManager.LoadScene(nextSceneName);
     }
@@ -355,12 +356,12 @@ public class DoorCodePuzzleController : MonoBehaviour
 
     private void OnGUI()
     {
-        if (transitionWhiteAlpha > 0f)
+        if (transitionBlackAlpha > 0f)
         {
             Color oldOverlayColor = GUI.color;
             int oldDepth = GUI.depth;
             GUI.depth = -10000;
-            GUI.color = new Color(1f, .96f, .84f, transitionWhiteAlpha);
+            GUI.color = new Color(0f, 0f, 0f, transitionBlackAlpha);
             GUI.DrawTexture(new Rect(0f, 0f, Screen.width, Screen.height), Texture2D.whiteTexture);
             GUI.color = oldOverlayColor;
             GUI.depth = oldDepth;
@@ -414,7 +415,10 @@ public class DoorCodePuzzleController : MonoBehaviour
     {
         float scale = Mathf.Clamp(Screen.height / 900f, .75f, 1.25f);
         float width = 430f * scale;
-        float height = 420f * scale;
+        // The fourth keypad row (delete, 0, confirm) reaches about 483 scaled
+        // pixels below the panel top. Keep it inside the panel bounds so a
+        // click on 0 is not mistaken for an outside click that closes the UI.
+        float height = 510f * scale;
         return new Rect((Screen.width - width) * .5f, (Screen.height - height) * .5f - 25f * scale, width, height);
     }
 }

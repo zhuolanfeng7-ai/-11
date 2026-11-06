@@ -1,3 +1,4 @@
+#if LOCAL_SCENE3_AUDIT
 using System;using System.IO;using System.Linq;using System.Collections.Generic;using UnityEngine;using UnityEditor;using UnityEditor.SceneManagement;
 [InitializeOnLoad]public static class GuiziReflectionFix{
  const string Done="D:/-11-scene3-audit/guizi-fixed.txt";static double next;static GuiziReflectionFix(){EditorApplication.update+=Tick;}static void Tick(){if(EditorApplication.timeSinceStartup<next)return;next=EditorApplication.timeSinceStartup+5;if(File.Exists(Done)||EditorApplication.isUpdating||EditorApplication.isCompiling||EditorApplication.isPlayingOrWillChangePlaymode)return;Run();}
@@ -10,3 +11,5 @@ using System;using System.IO;using System.Linq;using System.Collections.Generic;
  AssetDatabase.SaveAssets();EditorSceneManager.MarkSceneDirty(s);EditorSceneManager.SaveScene(s);File.WriteAllLines(Done,report);
  }catch(Exception e){File.WriteAllText("D:/-11-scene3-audit/guizi-fix-error.txt",e.ToString());}}
 }
+
+#endif

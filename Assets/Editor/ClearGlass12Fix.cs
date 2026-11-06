@@ -1,3 +1,4 @@
+#if LOCAL_SCENE3_AUDIT
 using System;using System.IO;using System.Linq;using System.Collections.Generic;using UnityEngine;using UnityEditor;using UnityEditor.SceneManagement;
 [InitializeOnLoad]public static class ClearGlass12Fix{
  const string Done="D:/-11-scene3-audit/glass12-frosted.txt";static double next;static ClearGlass12Fix(){EditorApplication.update+=Tick;EditorApplication.delayCall+=Run;}static void Tick(){if(EditorApplication.timeSinceStartup<next)return;next=EditorApplication.timeSinceStartup+5;Run();}
@@ -11,3 +12,5 @@ using System;using System.IO;using System.Linq;using System.Collections.Generic;
 }
 
 
+
+#endif

@@ -49,6 +49,7 @@ public sealed class ImportantItemCollectionUI : MonoBehaviour
     public Texture2D VisibleIcon(int index){if(!IsScene2)return index==0?scene1GlassesIcon:index==1?scene1PieceIcon:index==2?scene1FilmIcon:index==3?scene1SketchIcon:null;return index==0?alloyIcon:index==1?alloy2Icon:index==2?nailIcon:index==3?tapeIcon:null;}
     public Rect SlotScreenRect(int index){if(index<0||index>=VisibleSlotCount)return Rect.zero;if(!IsScene2){var slot=Scene1InventoryCanvasBridge.ScreenSlot(index);if(slot.width>0)return slot;}float scale=Mathf.Clamp(Screen.height/900f,.75f,1.15f),size=58*scale,gap=12*scale;int count=VisibleSlotCount;float top=(Screen.height-(count*size+(count-1)*gap))*.5f+index*(size+gap);return new Rect(Screen.width-size-22*scale,Screen.height-top-size,size,size);}
 
+    private bool IsScene1 => string.Equals(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name.Replace(" ",""),"scene1",System.StringComparison.OrdinalIgnoreCase);
     private bool IsScene2 => string.Equals(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name.Replace(" ",""),"scene2",System.StringComparison.OrdinalIgnoreCase);
     public bool StoreAlloy(Texture2D icon){return StoreAlloyInSlot(0,icon);}
     public bool StoreAlloyInSlot(int slot,Texture2D icon)
@@ -71,6 +72,9 @@ public sealed class ImportantItemCollectionUI : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void CreateForScene()
     {
+        string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name.Replace(" ", "");
+        if (!string.Equals(sceneName, "scene1", System.StringComparison.OrdinalIgnoreCase)
+            && !string.Equals(sceneName, "scene2", System.StringComparison.OrdinalIgnoreCase)) return;
         if (FindObjectOfType<ImportantItemCollectionUI>() != null) return;
         new GameObject("Important Item Collection UI").AddComponent<ImportantItemCollectionUI>();
     }
@@ -118,6 +122,7 @@ public sealed class ImportantItemCollectionUI : MonoBehaviour
 
     private void OnGUI()
     {
+        if (!IsScene1 && !IsScene2) return;
         // The right-side archive is now a concrete Canvas hierarchy created in
         // Edit Mode. Keep this legacy renderer only as a fallback for old scenes.
         if (GameObject.Find("RightInventoryPanel") != null) return;

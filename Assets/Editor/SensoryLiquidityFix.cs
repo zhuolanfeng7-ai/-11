@@ -1,3 +1,4 @@
+#if LOCAL_SCENE3_AUDIT
 using System;using System.IO;using System.Linq;using UnityEngine;using UnityEditor;using UnityEditor.SceneManagement;
 [InitializeOnLoad]public static class SensoryLiquidityFix{
  const string Done="D:/-11-scene3-audit/sign-fixed.txt";static double next;static SensoryLiquidityFix(){EditorApplication.delayCall+=Run;EditorApplication.update+=Tick;}static void Tick(){if(EditorApplication.timeSinceStartup<next)return;next=EditorApplication.timeSinceStartup+4;Run();}
@@ -8,4 +9,5 @@ using System;using System.IO;using System.Linq;using UnityEngine;using UnityEdit
  var go=new GameObject("Sign verification camera"){hideFlags=HideFlags.HideAndDontSave};var cam=go.AddComponent<Camera>();cam.enabled=false;var normal=rr.transform.forward;var b=rr.bounds;cam.transform.position=b.center+new Vector3(2,0,0);cam.transform.LookAt(b.center);cam.fieldOfView=45;cam.nearClipPlane=.005f;cam.farClipPlane=50;cam.allowHDR=true;var view=go.AddComponent<Scene3ColorView>();view.viewShader=Shader.Find("BlenderScene3/ColorView");var rt=RenderTexture.GetTemporary(1000,500,24,RenderTextureFormat.ARGBHalf);var active=RenderTexture.active;try{cam.targetTexture=rt;cam.Render();RenderTexture.active=rt;var img=new Texture2D(1000,500,TextureFormat.RGB24,false);img.ReadPixels(new Rect(0,0,1000,500),0,0);if(!rt.sRGB){var px=img.GetPixels();for(int j=0;j<px.Length;j++)px[j]=px[j].gamma;img.SetPixels(px);}img.Apply();File.WriteAllBytes("D:/-11-scene3-audit/sign-after.png",img.EncodeToPNG());UnityEngine.Object.DestroyImmediate(img);}finally{RenderTexture.active=active;RenderTexture.ReleaseTemporary(rt);UnityEngine.Object.DestroyImmediate(go);}
  }catch(Exception e){File.WriteAllText("D:/-11-scene3-audit/sign-error.txt",e.ToString());}}
 }
+#endif
 

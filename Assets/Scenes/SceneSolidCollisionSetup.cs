@@ -18,7 +18,7 @@ public static class SceneSolidCollisionSetup
         foreach(var renderer in root.GetComponentsInChildren<Renderer>(true))
         {
             if(!(renderer is MeshRenderer)&&!(renderer is SkinnedMeshRenderer))continue;
-            if(renderer.GetComponentInParent<Canvas>()||renderer.GetComponentInParent<Camera>()||renderer.GetComponentInParent<FirstPersonPlayer>())continue;
+            if(renderer.GetComponentInParent<Canvas>()||renderer.GetComponentInParent<Camera>()||renderer.GetComponentInParent<FirstPersonPlayer>()||renderer.GetComponentInParent<Robot3FirstPerson>())continue;
             var meshFilter=renderer.GetComponent<MeshFilter>();
             if(renderer is MeshRenderer&&(!meshFilter||!meshFilter.sharedMesh||meshFilter.sharedMesh.vertexCount==0))continue;
             if(HasSolidCoverage(renderer)){existing++;continue;}

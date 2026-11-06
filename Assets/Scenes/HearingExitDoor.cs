@@ -146,7 +146,7 @@ public sealed class HearingExitDoor : MonoBehaviour
     void Update()
     {
         if(!installation)installation=FindObjectOfType<EarSafeInstallation>();
-        if(!SequenceStarted)TryBegin();
+        if(!SequenceStarted)TryBeginFromDoorClick();
         if(!IsOpen||!Camera.main)return;
         var position=player?player.transform.position:Camera.main.transform.position;
         float side=(position.x-closedBounds.center.x)*originalSide;
@@ -156,6 +156,27 @@ public sealed class HearingExitDoor : MonoBehaviour
         AudioListener.volume=initialListenerVolume*Mathf.Lerp(1,.12f,approach);
         float fade=within?Mathf.Clamp01((-side+1)/18):0;
         whiteout=Mathf.MoveTowards(whiteout,fade,Time.unscaledDeltaTime*.8f);
+    }
+    bool TryBeginFromDoorClick()
+    {
+        if(!Input.GetMouseButtonDown(0)||!Camera.main||EvidenceInspect.BlocksWorldInput||!RequirementsMet())return false;
+        var ray=Camera.main.ScreenPointToRay(Input.mousePosition);
+        float maxDistance=180f;
+        bool clicked=false;
+        foreach(var collider in leaf.GetComponentsInChildren<Collider>(true))
+        {
+            RaycastHit hit;
+            if(collider&&collider.enabled&&!collider.isTrigger&&collider.Raycast(ray,out hit,maxDistance)){clicked=true;break;}
+        }
+        if(!clicked)
+        {
+            foreach(var renderer in leaf.GetComponentsInChildren<Renderer>(true))
+            {
+                float distance;
+                if(renderer&&renderer.enabled&&renderer.bounds.IntersectRay(ray,out distance)&&distance<=maxDistance){clicked=true;break;}
+            }
+        }
+        return clicked&&TryBegin();
     }
     public bool TryBegin()
     {
@@ -182,6 +203,8 @@ public sealed class HearingExitDoor : MonoBehaviour
         yield return new WaitForSecondsRealtime(.3f);
         yield return AnimateDoor(.085f,1,2.4f);
         IsOpen=true;
+        yield return new WaitForSecondsRealtime(3f);
+        SceneManager.LoadScene("scene3",LoadSceneMode.Single);
     }
     IEnumerator AnimateDoor(float from,float to,float duration)
     {

@@ -1,16 +1,11 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-#if UNITY_EDITOR
-using UnityEditor;
-using UnityEditor.SceneManagement;
-#endif
 
 /// <summary>
 /// Owns all interaction logic for the GlassPuzzle hierarchy.
 /// The child named Glass is treated as replaceable visual content.
 /// </summary>
-[ExecuteAlways]
 public sealed class GlassPuzzleController : MonoBehaviour
 {
     [Header("Hierarchy References")]
@@ -279,7 +274,7 @@ public sealed class GlassPuzzleController : MonoBehaviour
         ShowVisualLore();
     }
 
-#if UNITY_EDITOR
+#if false // One-shot inventory UI baker already applied; retained only as implementation history.
     [InitializeOnLoadMethod]
     private static void ScheduleInventoryUIBake()
     {

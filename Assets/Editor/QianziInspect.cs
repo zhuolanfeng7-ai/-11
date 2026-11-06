@@ -1,2 +1,5 @@
+#if LOCAL_SCENE3_AUDIT
 using UnityEngine;using UnityEditor;using System.IO;using System.Linq;
 [InitializeOnLoad]public static class QianziInspect{static double next;static QianziInspect(){EditorApplication.update+=Tick;}static void Tick(){if(EditorApplication.timeSinceStartup<next||EditorApplication.isUpdating||EditorApplication.isCompiling)return;next=EditorApplication.timeSinceStartup+4;var s=UnityEngine.SceneManagement.SceneManager.GetActiveScene();if(s.name!="scene3"||File.Exists("D:/-11-scene3-audit/qianzi-source.txt"))return;var rows=s.GetRootGameObjects().SelectMany(g=>g.GetComponentsInChildren<Renderer>(true)).Where(r=>r.name.ToLower().Contains("qianzi")).SelectMany(r=>r.sharedMaterials.Select(m=>r.name+"|"+AssetDatabase.GetAssetPath(m)+"|"+AssetDatabase.GetAssetPath(m.mainTexture))).ToArray();if(rows.Length>0)File.WriteAllLines("D:/-11-scene3-audit/qianzi-source.txt",rows);}}
+
+#endif

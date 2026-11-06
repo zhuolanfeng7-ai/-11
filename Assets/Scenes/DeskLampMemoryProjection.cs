@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 
 /// <summary>One-way DeskLampPuzzle reveal: a warm light and a memory image appear at the ceiling centre.</summary>
+[DefaultExecutionOrder(-300)]
 public sealed class DeskLampMemoryProjection : MonoBehaviour
 {
     [Header("Click")]
@@ -53,18 +54,18 @@ public sealed class DeskLampMemoryProjection : MonoBehaviour
         if (!Input.GetMouseButtonDown(0) || revealed || revealRoutine != null || EvidenceInspect.BlocksWorldInput) return;
         if (viewCamera == null) viewCamera = Camera.main != null ? Camera.main : FindObjectOfType<Camera>();
         if (viewCamera == null || clickCollider == null) return;
-        if (Vector3.Distance(viewCamera.transform.position, clickCollider.ClosestPoint(viewCamera.transform.position)) > interactionDistance) return;
         Vector2 pointer = Cursor.lockState == CursorLockMode.Locked ? viewCamera.pixelRect.center : (Vector2)Input.mousePosition;
-        RaycastHit[] hits = Physics.RaycastAll(viewCamera.ScreenPointToRay(pointer), rayDistance, ~((1 << 30) | (1 << 31)), QueryTriggerInteraction.Collide);
-        System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
-        bool lampClicked = false;
-        foreach (RaycastHit hit in hits)
-        {
-            if (hit.collider.GetComponentInParent<FirstPersonPlayer>() != null) continue;
-            lampClicked = hit.transform == transform || hit.transform.IsChildOf(transform);
-            break;
-        }
+        Ray ray = viewCamera.ScreenPointToRay(pointer);
+        RaycastHit lampHit;
+        bool lampClicked = clickCollider.enabled && clickCollider.Raycast(ray, out lampHit, Mathf.Min(rayDistance, interactionDistance));
+        // Imported lamp meshes can also have authored child colliders. Accept
+        // those when the root click volume is unavailable or unusually shaped.
+        if (!lampClicked)
+            foreach (Collider child in GetComponentsInChildren<Collider>(true))
+                if (child != clickCollider && child.enabled && child.Raycast(ray, out lampHit, Mathf.Min(rayDistance, interactionDistance)))
+                { lampClicked = true; break; }
         if (!lampClicked || !BuildAtCeilingCentre()) return;
+        Debug.Log("[DeskLampMemory] Desk lamp clicked; starting ceiling reveal.", this);
         revealRoutine = StartCoroutine(RevealOnce());
     }
 
@@ -181,7 +182,7 @@ public sealed class DeskLampMemoryProjection : MonoBehaviour
         if (projectionPlane == null) yield break;
         projectionPlane.gameObject.SetActive(true);
         coreLight.enabled = glowLight.enabled = true;
-        for (float elapsed = 0f; elapsed < fadeSeconds; elapsed += Time.deltaTime)
+        for (float elapsed = 0f; elapsed < fadeSeconds; elapsed += Time.unscaledDeltaTime)
         {
             float t = Mathf.SmoothStep(0f, 1f, elapsed / fadeSeconds);
             coreLight.intensity = Mathf.Lerp(0f, lightIntensity, t);

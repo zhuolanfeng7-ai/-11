@@ -1,3 +1,4 @@
+#if LOCAL_SCENE3_AUDIT
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -103,3 +104,5 @@ AssetDatabase.SaveAssets();EditorSceneManager.MarkSceneDirty(s);EditorSceneManag
 
 
 
+
+#endif

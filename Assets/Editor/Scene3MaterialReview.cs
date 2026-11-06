@@ -1,3 +1,4 @@
+#if LOCAL_SCENE3_AUDIT
 using System;using System.IO;using System.Linq;using UnityEngine;using UnityEditor;
 [InitializeOnLoad]public static class Scene3MaterialReview {
  static double when;static Scene3MaterialReview(){when=EditorApplication.timeSinceStartup+8;EditorApplication.update+=Tick;}
@@ -7,3 +8,5 @@ using System;using System.IO;using System.Linq;using UnityEngine;using UnityEdit
  }catch(Exception e){File.WriteAllText("D:/-11-scene3-audit/material-review-error.txt",e.ToString());}}
 }
 
+
+#endif

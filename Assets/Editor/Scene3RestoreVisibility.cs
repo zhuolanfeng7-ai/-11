@@ -1,3 +1,4 @@
+#if LOCAL_SCENE3_AUDIT
 using System;
 using System.IO;
 using System.Linq;
@@ -34,3 +35,5 @@ public static class Scene3RestoreVisibility {
  }
 }
 
+
+#endif
