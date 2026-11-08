@@ -4833,6 +4833,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1473c2e676429d44e91521597ef46ae4, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2106357414}
+<<<<<<< Updated upstream
+=======
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1473c2e676429d44e91521597ef46ae4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2106357417}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1473c2e676429d44e91521597ef46ae4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2106357418}
+>>>>>>> Stashed changes
   m_SourcePrefab: {fileID: 100100000, guid: 1473c2e676429d44e91521597ef46ae4, type: 3}
 --- !u!1001 &486547723
 PrefabInstance:
@@ -6041,6 +6050,85 @@ MonoBehaviour:
   moveSpeed: 0.48
   mouseSensitivity: 1.5
   lookLimit: 80
+<<<<<<< Updated upstream
+=======
+--- !u!136 &2106357417
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2106357410}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.11
+  m_Height: 0.81
+  m_Direction: 2
+  m_Center: {x: 0, y: -0.000000116454586, z: 0.488446}
+--- !u!54 &2106357418
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2106357410}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!1 &2107909145 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3654934372253022927, guid: ead5db895e1b6604b84e1d2836b0acac, type: 3}
+  m_PrefabInstance: {fileID: 152367001}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &2107909149
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2107909145}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.020000001, y: 0.019999994, z: 0.019999994}
+  m_Center: {x: 0, y: 0, z: 0}
+>>>>>>> Stashed changes
 --- !u!1 &2111951644 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7749646088101624262, guid: ead5db895e1b6604b84e1d2836b0acac, type: 3}

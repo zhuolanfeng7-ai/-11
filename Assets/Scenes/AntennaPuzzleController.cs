@@ -406,13 +406,18 @@ public sealed class AntennaPuzzleController : MonoBehaviour
         return valid;
     }
 
-    private static void EnsureHoverScan(Collider buttonCollider)
+    private void EnsureHoverScan(Collider buttonCollider)
     {
         if (buttonCollider == null) return;
         HoverScanHighlight scan = buttonCollider.GetComponent<HoverScanHighlight>();
         if (scan == null) scan = buttonCollider.gameObject.AddComponent<HoverScanHighlight>();
+        scan.enabled = true;
         // Match the CrystalBallPuzzle hover treatment: the same purple/green
-        // neon outline, screen-space padding, and interaction range.
-        scan.Configure(20f, 12f);
+        // neon outline, screen-space padding, camera, and interaction range.
+        // Keeping this equal to interactionDistance prevents a button from
+        // being clickable while its hover feedback is still out of range.
+        scan.Configure(20f, interactionDistance);
+        scan.ConfigureViewCamera(interactionCamera);
+        scan.ConfigureVisualRoot(buttonCollider.transform);
     }
 }

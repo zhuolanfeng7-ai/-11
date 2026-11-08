@@ -10,11 +10,41 @@ public sealed class Robot3FirstPerson : MonoBehaviour
     [SerializeField] private float lookLimit = 80f;
     private float yaw;
     private float pitch;
+<<<<<<< Updated upstream
+=======
+    private Rigidbody body;
+    private CapsuleCollider capsule;
+    private Vector2 moveInput;
+    private Quaternion importedModelRotation;
+    private float startingYaw;
+    private float lockedWorldY;
+    private static readonly RigidbodyConstraints StableConstraints =
+        RigidbodyConstraints.FreezePositionY |
+        RigidbodyConstraints.FreezeRotationX |
+        RigidbodyConstraints.FreezeRotationZ;
+
+    private void Awake()
+    {
+        body = GetComponent<Rigidbody>();
+        if (!body) body = gameObject.AddComponent<Rigidbody>();
+        capsule = GetComponent<CapsuleCollider>();
+        importedModelRotation = transform.rotation;
+        lockedWorldY = transform.position.y;
+        body.useGravity = false;
+        body.isKinematic = false;
+        body.interpolation = RigidbodyInterpolation.Interpolate;
+        body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        body.detectCollisions = true;
+        body.constraints = StableConstraints;
+        if (capsule) { capsule.enabled = true; capsule.isTrigger = false; }
+    }
+>>>>>>> Stashed changes
 
     private void Start()
     {
         if (!eyeCamera) { enabled = false; Debug.LogError("Robot3 eye camera is missing.", this); return; }
         yaw = eyeCamera.transform.eulerAngles.y;
+        startingYaw = yaw;
         pitch = 0f;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -29,8 +59,40 @@ public sealed class Robot3FirstPerson : MonoBehaviour
         pitch = Mathf.Clamp(pitch - Input.GetAxisRaw("Mouse Y") * mouseSensitivity, -lookLimit, lookLimit);
         transform.rotation = Quaternion.AngleAxis(deltaYaw, Vector3.up) * transform.rotation;
         eyeCamera.transform.rotation = Quaternion.Euler(pitch, yaw, 0f);
+<<<<<<< Updated upstream
         Vector2 keys = new Vector2((Input.GetKey(KeyCode.D) ? 1f : 0f) - (Input.GetKey(KeyCode.A) ? 1f : 0f), (Input.GetKey(KeyCode.W) ? 1f : 0f) - (Input.GetKey(KeyCode.S) ? 1f : 0f));
         keys = Vector2.ClampMagnitude(keys, 1f);
+=======
+        moveInput = new Vector2((Input.GetKey(KeyCode.D) ? 1f : 0f) - (Input.GetKey(KeyCode.A) ? 1f : 0f), (Input.GetKey(KeyCode.W) ? 1f : 0f) - (Input.GetKey(KeyCode.S) ? 1f : 0f));
+        moveInput = Vector2.ClampMagnitude(moveInput, 1f);
+    }
+
+    private void FixedUpdate()
+    {
+        if (!body) return;
+
+        // The imported robot is rotated -90 degrees. If its Rigidbody rotation
+        // constraints or collision flags are changed at runtime, the Z-axis
+        // capsule falls sideways and the player appears to float through the room.
+        // Reassert the authored physics contract before every simulation step.
+        body.useGravity = false;
+        body.isKinematic = false;
+        body.detectCollisions = true;
+        body.constraints = StableConstraints;
+        body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        if (capsule) { capsule.enabled = true; capsule.isTrigger = false; }
+
+        Quaternion targetRotation = Quaternion.AngleAxis(yaw - startingYaw, Vector3.up) * importedModelRotation;
+        body.angularVelocity = Vector3.zero;
+        body.MoveRotation(targetRotation);
+
+        // FreezePositionY normally protects this value. Restoring it explicitly
+        // also recovers from a one-frame constraint loss or a direct Transform write.
+        Vector3 position = body.position;
+        if (Mathf.Abs(position.y - lockedWorldY) > .001f)
+            body.position = new Vector3(position.x, lockedWorldY, position.z);
+
+>>>>>>> Stashed changes
         Vector3 forward = Quaternion.Euler(0f, yaw, 0f) * Vector3.forward;
         Vector3 right = Quaternion.Euler(0f, yaw, 0f) * Vector3.right;
         transform.position += (forward * keys.y + right * keys.x) * (moveSpeed * Time.deltaTime);

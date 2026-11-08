@@ -11,8 +11,9 @@ public sealed class Scene2MicrophoneLighting : MonoBehaviour
 {
  private Scene2MicrophoneDialogue dialogue;private Transform microphone;private TelescopingDevice device;private AlloyPickup reward;
  private readonly List<Light> pathLights=new List<Light>();
- private Light spotlight,fill;private Light[] roomLights;private float[] intensities;
+ private Light spotlight,fill;private Light[] roomLights;private float[] intensities;private bool[] lightEnabledStates;
  private AmbientMode ambientMode;private Color ambientLight,sky,equator,ground;private float ambientIntensity,reflectionIntensity;
+ private Material skybox;private Light sun;private bool fog;private Color fogColor;private FogMode fogMode;private float fogDensity,linearFogStart,linearFogEnd;
  private readonly Dictionary<Material,Material> copies=new Dictionary<Material,Material>();
  private readonly Dictionary<Renderer,Material[]> originals=new Dictionary<Renderer,Material[]>();
  private readonly Dictionary<Material,Color> emissions=new Dictionary<Material,Color>();
@@ -28,13 +29,20 @@ public sealed class Scene2MicrophoneLighting : MonoBehaviour
   microphone=all.FirstOrDefault(t=>string.Equals(t.name,"maikefeng",StringComparison.OrdinalIgnoreCase));
   device=all.Select(t=>t.GetComponent<TelescopingDevice>()).FirstOrDefault(d=>d&&d.FollowingParts.Contains(microphone));
   if(!device)device=all.Select(t=>t.GetComponent<TelescopingDevice>()).FirstOrDefault(d=>d);
-  var reveal=device?device.GetComponent<TubeRewardReveal>():null;reward=reveal&&reveal.Alloy?reveal.Alloy.GetComponent<AlloyPickup>():null;
+  var reveal=device?device.GetComponent<TubeRewardReveal>():null;
+  // The imported alloy hierarchy can place AlloyPickup on the visible child
+  // rather than on the named alloy1 root. Resolve both layouts so collecting
+  // alloy1 always triggers the two-second world-light recovery.
+  reward=reveal&&reveal.Alloy?reveal.Alloy.GetComponentInChildren<AlloyPickup>(true):null;
+  if(!reward)reward=all.Where(t=>string.Equals(t.name.Trim(),"alloy1",StringComparison.OrdinalIgnoreCase))
+                       .SelectMany(t=>t.GetComponentsInChildren<AlloyPickup>(true)).FirstOrDefault();
   if(!microphone||!device||!reward){Debug.LogWarning("Opening lighting needs maikefeng, its retracting assembly and alloy1 pickup.",this);return;}
   var filter=microphone.GetComponent<MeshFilter>();if(filter&&!microphone.GetComponent<Collider>()){var box=microphone.gameObject.AddComponent<BoxCollider>();box.center=filter.sharedMesh.bounds.center;box.size=filter.sharedMesh.bounds.size;}
   var hover=microphone.GetComponent<HoverScanHighlight>();if(!hover)hover=microphone.gameObject.AddComponent<HoverScanHighlight>();hover.ConfigureScene2();hover.Configure(6,100);
   dialogue=microphone.GetComponent<Scene2MicrophoneDialogue>();if(!dialogue)dialogue=microphone.gameObject.AddComponent<Scene2MicrophoneDialogue>();dialogue.Configure(device);
-  roomLights=FindObjectsOfType<Light>().Where(l=>l.gameObject.scene==gameObject.scene).ToArray();intensities=roomLights.Select(l=>l.intensity).ToArray();
+  roomLights=FindObjectsOfType<Light>().Where(l=>l.gameObject.scene==gameObject.scene).ToArray();intensities=roomLights.Select(l=>l.intensity).ToArray();lightEnabledStates=roomLights.Select(l=>l.enabled).ToArray();
   ambientMode=RenderSettings.ambientMode;ambientLight=RenderSettings.ambientLight;sky=RenderSettings.ambientSkyColor;equator=RenderSettings.ambientEquatorColor;ground=RenderSettings.ambientGroundColor;ambientIntensity=RenderSettings.ambientIntensity;reflectionIntensity=RenderSettings.reflectionIntensity;
+  skybox=RenderSettings.skybox;sun=RenderSettings.sun;fog=RenderSettings.fog;fogColor=RenderSettings.fogColor;fogMode=RenderSettings.fogMode;fogDensity=RenderSettings.fogDensity;linearFogStart=RenderSettings.fogStartDistance;linearFogEnd=RenderSettings.fogEndDistance;
   // Runtime material copies leave the authored materials and neon colours intact.
   foreach(var renderer in all.Select(t=>t.GetComponent<Renderer>()).Where(r=>r)){
    var materials=renderer.sharedMaterials;if(!materials.Any(m=>m&&m.HasProperty("_EmissionColor")&&m.GetColor("_EmissionColor").maxColorComponent>.001f))continue;
@@ -88,7 +96,14 @@ lastRouteEnd=route[route.Count-1];routeBuilt=true;
   foreach(var light in pathLights)if(light)light.intensity=2.15f*(1-amount);
   if(spotlight)spotlight.intensity=14*(1-amount);if(fill)fill.intensity=.3f*(1-amount);
  }
- private void LateUpdate(){if(!initialized)return;if(!restored)PositionLights();if(!restoring&&!restored&&reward&&reward.IsCollected){restoring=true;StartCoroutine(Restore());}if(!Application.isFocused||EvidenceInspect.BlocksWorldInput||!Input.GetMouseButtonDown(0))return;var camera=Camera.main;if(camera)TryInteract(camera,Cursor.lockState==CursorLockMode.Locked?camera.pixelRect.center:(Vector2)Input.mousePosition);}
+ private bool HasCollectedRecoveryAlloy(){
+  if(reward&&reward.IsCollected)return true;
+  var inventory=FindObjectOfType<ImportantItemCollectionUI>();
+  // Preserve the original alloy1 trigger and also accept alloy2, which is the
+  // recovery pickup used by the current scene flow.
+  return inventory&&(inventory.HasAlloy||inventory.HasAlloy2);
+ }
+ private void LateUpdate(){if(!initialized)return;if(!restored)PositionLights();if(!restoring&&!restored&&HasCollectedRecoveryAlloy()){restoring=true;StartCoroutine(Restore());}if(!Application.isFocused||EvidenceInspect.BlocksWorldInput||!Input.GetMouseButtonDown(0))return;var camera=Camera.main;if(camera)TryInteract(camera,Cursor.lockState==CursorLockMode.Locked?camera.pixelRect.center:(Vector2)Input.mousePosition);}
  public bool TryInteract(Camera camera,Vector2 pointer){
   if(!initialized||!camera||EvidenceInspect.BlocksWorldInput||!camera.pixelRect.Contains(pointer)||device.IsRetracted||device.IsRetracting)return false;
   Physics.SyncTransforms();foreach(var hit in Physics.RaycastAll(camera.ScreenPointToRay(pointer),camera.farClipPlane,~((1<<30)|(1<<31)),QueryTriggerInteraction.Ignore).OrderBy(h=>h.distance)){
@@ -99,8 +114,22 @@ lastRouteEnd=route[route.Count-1];routeBuilt=true;
  }
  private IEnumerator Restore(){
   var camera=Camera.main;if(camera){var effect=camera.GetComponent<Scene2RecoveryGlitch>();if(!effect)effect=camera.gameObject.AddComponent<Scene2RecoveryGlitch>();if(effect.Begin()){while(effect&&effect.IsPlaying)yield return null;}}
-  for(float t=0;t<2;t+=Time.unscaledDeltaTime){progress=Mathf.SmoothStep(0,1,t/2);Apply(progress);yield return null;}Apply(1);RestoreOriginals();restored=true;}
- private void RestoreOriginals(){if(!initialized)return;for(int i=0;i<roomLights.Length;i++)if(roomLights[i])roomLights[i].intensity=intensities[i];RenderSettings.ambientMode=ambientMode;RenderSettings.ambientLight=ambientLight;RenderSettings.ambientSkyColor=sky;RenderSettings.ambientEquatorColor=equator;RenderSettings.ambientGroundColor=ground;RenderSettings.ambientIntensity=ambientIntensity;RenderSettings.reflectionIntensity=reflectionIntensity;foreach(var pair in originals)if(pair.Key)pair.Key.sharedMaterials=pair.Value;foreach(var copy in copies.Values)if(copy)Destroy(copy);originals.Clear();copies.Clear();emissions.Clear();}
+  for(float t=0;t<2;t+=Time.unscaledDeltaTime){progress=Mathf.SmoothStep(0,1,t/2);Apply(progress);yield return null;}
+  // Return to the exact lighting authored in scene 2.unity: its Directional
+  // Light, default-skybox ambient probe, reflection intensity and materials.
+  Apply(1);RestoreOriginals();restored=true;}
+ private void RestoreOriginals(){
+  if(!initialized)return;
+  for(int i=0;i<roomLights.Length;i++)if(roomLights[i]){roomLights[i].enabled=lightEnabledStates[i];roomLights[i].intensity=intensities[i];}
+  RenderSettings.skybox=skybox;RenderSettings.sun=sun;RenderSettings.ambientMode=ambientMode;RenderSettings.ambientLight=ambientLight;RenderSettings.ambientSkyColor=sky;RenderSettings.ambientEquatorColor=equator;RenderSettings.ambientGroundColor=ground;RenderSettings.ambientIntensity=ambientIntensity;RenderSettings.reflectionIntensity=reflectionIntensity;
+  RenderSettings.fog=fog;RenderSettings.fogColor=fogColor;RenderSettings.fogMode=fogMode;RenderSettings.fogDensity=fogDensity;RenderSettings.fogStartDistance=linearFogStart;RenderSettings.fogEndDistance=linearFogEnd;
+  // Switching from the opening Flat ambient mode back to Scene2's skybox does
+  // not refresh the ambient probe automatically on every scene-load path.
+  // Force the authored Scene2 environment to be sampled again so unlit areas
+  // such as the drums, drum set and radio receive their original illumination.
+  DynamicGI.UpdateEnvironment();
+  foreach(var pair in originals)if(pair.Key)pair.Key.sharedMaterials=pair.Value;foreach(var copy in copies.Values)if(copy)Destroy(copy);originals.Clear();copies.Clear();emissions.Clear();
+ }
  private void OnDestroy(){RestoreOriginals();}
 }
 

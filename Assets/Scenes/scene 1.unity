@@ -858,7 +858,7 @@ Transform:
   m_GameObject: {fileID: 248386736}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: 0.7071068, z: 0, w: 0}
-  m_LocalPosition: {x: 11.29, y: 17.513, z: -20.6505}
+  m_LocalPosition: {x: 11.29, y: 16.81, z: -20.69}
   m_LocalScale: {x: 0.17470585, y: 0.47755456, z: 0.27599394}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1068,6 +1068,27 @@ MonoBehaviour:
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
   framePaddingPixels: 20
   hoverDistance: 5
+  glassesOutlineColor: {r: 0.55, g: 0.28, b: 0.9, a: 0.34}
+  glassesOutlineIntensity: 1
+  glassesOutlinePower: 2.8
+  glassesSurfaceGlow: 0.634
+  buttonOutlineColor: {r: 0.55, g: 0.28, b: 0.9, a: 0.34}
+  buttonOutlineIntensity: 1
+  buttonOutlinePower: 2.8
+  buttonSurfaceGlow: 0
+  buttonFramePurple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
+  buttonFrameGreen: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  buttonFramePadding: 6
+  buttonFrameIntensity: 1
+  alloy2OutlineColor: {r: 0.58, g: 0.22, b: 0.92, a: 0.3}
+  alloy2OutlineWidthRatio: 0.0045
+  alloy2GlowIntensity: 0.78
+  alloy2GlowSpread: 1.8
+  alloy2OuterGlowStrength: 0.28
+  alloy2FramePurple: {r: 0.78, g: 0.2, b: 1, a: 0.9}
+  alloy2FrameGreen: {r: 0.15, g: 1, b: 0.42, a: 0.82}
+  alloy2FramePadding: 6
+  alloy2FrameIntensity: 0.85
   revealOwner: {fileID: 0}
   scene2Object: 0
   crankReward: {fileID: 0}
@@ -2348,7 +2369,7 @@ Transform:
   m_GameObject: {fileID: 731967866}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: -2.7455702, y: -0.40634984, z: -0.7724998}
+  m_LocalPosition: {x: -2.7455702, y: -1.082, z: -0.7724998}
   m_LocalScale: {x: 0.39849624, y: 0.14962183, z: 0.42520687}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2393,6 +2414,27 @@ MonoBehaviour:
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
   framePaddingPixels: 20
   hoverDistance: 12
+  glassesOutlineColor: {r: 0.55, g: 0.28, b: 0.9, a: 0.34}
+  glassesOutlineIntensity: 1
+  glassesOutlinePower: 2.8
+  glassesSurfaceGlow: 0
+  buttonOutlineColor: {r: 0.55, g: 0.28, b: 0.9, a: 0.34}
+  buttonOutlineIntensity: 1.87
+  buttonOutlinePower: 5.06
+  buttonSurfaceGlow: 0.616
+  buttonFramePurple: {r: 0.6296706, g: 0, b: 0.8679245, a: 0.95}
+  buttonFrameGreen: {r: 0, g: 0.9056604, b: 0.287975, a: 0.9}
+  buttonFramePadding: 11.4
+  buttonFrameIntensity: 2
+  alloy2OutlineColor: {r: 0.58, g: 0.22, b: 0.92, a: 0.3}
+  alloy2OutlineWidthRatio: 0.0045
+  alloy2GlowIntensity: 0.78
+  alloy2GlowSpread: 1.8
+  alloy2OuterGlowStrength: 0.28
+  alloy2FramePurple: {r: 0.78, g: 0.2, b: 1, a: 0.9}
+  alloy2FrameGreen: {r: 0.15, g: 1, b: 0.42, a: 0.82}
+  alloy2FramePadding: 6
+  alloy2FrameIntensity: 0.85
   revealOwner: {fileID: 0}
   scene2Object: 0
   crankReward: {fileID: 0}
@@ -3563,7 +3605,7 @@ Transform:
   m_GameObject: {fileID: 1075492365}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: -2.7456, y: -1.1203119, z: -0.7596798}
+  m_LocalPosition: {x: -2.7456, y: -1.7959634, z: -0.7596798}
   m_LocalScale: {x: 0.39849624, y: 0.14962183, z: 0.42520687}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3608,6 +3650,27 @@ MonoBehaviour:
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
   framePaddingPixels: 20
   hoverDistance: 12
+  glassesOutlineColor: {r: 0.55, g: 0.28, b: 0.9, a: 0.34}
+  glassesOutlineIntensity: 1
+  glassesOutlinePower: 2.8
+  glassesSurfaceGlow: 0
+  buttonOutlineColor: {r: 0.55, g: 0.28, b: 0.9, a: 0.34}
+  buttonOutlineIntensity: 1
+  buttonOutlinePower: 2.8
+  buttonSurfaceGlow: 0
+  buttonFramePurple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
+  buttonFrameGreen: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  buttonFramePadding: 6
+  buttonFrameIntensity: 1
+  alloy2OutlineColor: {r: 0.58, g: 0.22, b: 0.92, a: 0.3}
+  alloy2OutlineWidthRatio: 0.0045
+  alloy2GlowIntensity: 0.78
+  alloy2GlowSpread: 1.8
+  alloy2OuterGlowStrength: 0.28
+  alloy2FramePurple: {r: 0.78, g: 0.2, b: 1, a: 0.9}
+  alloy2FrameGreen: {r: 0.15, g: 1, b: 0.42, a: 0.82}
+  alloy2FramePadding: 6
+  alloy2FrameIntensity: 0.85
   revealOwner: {fileID: 0}
   scene2Object: 0
   crankReward: {fileID: 0}
@@ -4429,6 +4492,27 @@ MonoBehaviour:
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
   framePaddingPixels: 20
   hoverDistance: 5
+  glassesOutlineColor: {r: 0.55, g: 0.28, b: 0.9, a: 0.34}
+  glassesOutlineIntensity: 1
+  glassesOutlinePower: 2.8
+  glassesSurfaceGlow: 0
+  buttonOutlineColor: {r: 0.55, g: 0.28, b: 0.9, a: 0.34}
+  buttonOutlineIntensity: 1
+  buttonOutlinePower: 2.8
+  buttonSurfaceGlow: 0
+  buttonFramePurple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
+  buttonFrameGreen: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  buttonFramePadding: 6
+  buttonFrameIntensity: 1
+  alloy2OutlineColor: {r: 0.58, g: 0.22, b: 0.92, a: 0.3}
+  alloy2OutlineWidthRatio: 0.0045
+  alloy2GlowIntensity: 0.78
+  alloy2GlowSpread: 1.8
+  alloy2OuterGlowStrength: 0.28
+  alloy2FramePurple: {r: 0.78, g: 0.2, b: 1, a: 0.9}
+  alloy2FrameGreen: {r: 0.15, g: 1, b: 0.42, a: 0.82}
+  alloy2FramePadding: 6
+  alloy2FrameIntensity: 0.85
   revealOwner: {fileID: 0}
   scene2Object: 0
   crankReward: {fileID: 0}
@@ -4625,7 +4709,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d2af72462a0119c429ae6b5817d7dc6d, type: 3}
       propertyPath: m_LocalScale.z
-      value: 6.2069345
+      value: 5.5738273
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d2af72462a0119c429ae6b5817d7dc6d, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4633,7 +4717,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d2af72462a0119c429ae6b5817d7dc6d, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 12.34
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d2af72462a0119c429ae6b5817d7dc6d, type: 3}
       propertyPath: m_LocalPosition.z
@@ -5343,6 +5427,109 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a15c785a52612a840aa9f2f1681f1663, type: 3}
+<<<<<<< Updated upstream
+=======
+--- !u!1 &1583075706
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1583075707}
+  - component: {fileID: 1583075709}
+  - component: {fileID: 1583075708}
+  m_Layer: 0
+  m_Name: FilmFunction
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1583075707
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1583075706}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 761429668}
+  m_Father: {fileID: 199938477}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1583075708
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1583075706}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3fa0d91c7e24a0f8d5c6b7a9e1f2d34, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  visualRoot: {fileID: 0}
+  viewCamera: {fileID: 0}
+  purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
+  green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
+  framePaddingPixels: 20
+  hoverDistance: 5
+  glassesOutlineColor: {r: 0.55, g: 0.28, b: 0.9, a: 0.34}
+  glassesOutlineIntensity: 1
+  glassesOutlinePower: 2.8
+  glassesSurfaceGlow: 0
+  buttonOutlineColor: {r: 0.55, g: 0.28, b: 0.9, a: 0.34}
+  buttonOutlineIntensity: 1
+  buttonOutlinePower: 2.8
+  buttonSurfaceGlow: 0
+  buttonFramePurple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
+  buttonFrameGreen: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  buttonFramePadding: 6
+  buttonFrameIntensity: 1
+  alloy2OutlineColor: {r: 0.58, g: 0.22, b: 0.92, a: 0.3}
+  alloy2OutlineWidthRatio: 0.0045
+  alloy2GlowIntensity: 0.78
+  alloy2GlowSpread: 1.8
+  alloy2OuterGlowStrength: 0.28
+  alloy2FramePurple: {r: 0.78, g: 0.2, b: 1, a: 0.9}
+  alloy2FrameGreen: {r: 0.15, g: 1, b: 0.42, a: 0.82}
+  alloy2FramePadding: 6
+  alloy2FrameIntensity: 0.85
+  revealOwner: {fileID: 0}
+  scene2Object: 0
+  crankReward: {fileID: 0}
+  occlusionHousing: {fileID: 0}
+--- !u!114 &1583075709
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1583075706}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e0a0a2db59149f7bc4a9f3a14e31f8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  filmVisualRoot: {fileID: 761429668}
+  filmCollider: {fileID: 0}
+  screenCollider: {fileID: 248386737}
+  interactionCamera: {fileID: 132817246}
+  player: {fileID: 0}
+  antennaPuzzle: {fileID: 1725074776}
+  interactionDistance: 12
+  clickRayDistance: 100
+  approachLoreDistance: 8
+>>>>>>> Stashed changes
 --- !u!1 &1589081459
 GameObject:
   m_ObjectHideFlags: 0
@@ -5891,6 +6078,27 @@ MonoBehaviour:
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
   framePaddingPixels: 20
   hoverDistance: 5
+  glassesOutlineColor: {r: 0.55, g: 0.28, b: 0.9, a: 0.34}
+  glassesOutlineIntensity: 1
+  glassesOutlinePower: 2.8
+  glassesSurfaceGlow: 0
+  buttonOutlineColor: {r: 0.55, g: 0.28, b: 0.9, a: 0.34}
+  buttonOutlineIntensity: 1
+  buttonOutlinePower: 2.8
+  buttonSurfaceGlow: 0
+  buttonFramePurple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
+  buttonFrameGreen: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  buttonFramePadding: 6
+  buttonFrameIntensity: 1
+  alloy2OutlineColor: {r: 0.58, g: 0.22, b: 0.92, a: 0.3}
+  alloy2OutlineWidthRatio: 0.0045
+  alloy2GlowIntensity: 0.78
+  alloy2GlowSpread: 1.8
+  alloy2OuterGlowStrength: 0.28
+  alloy2FramePurple: {r: 0.78, g: 0.2, b: 1, a: 0.9}
+  alloy2FrameGreen: {r: 0.15, g: 1, b: 0.42, a: 0.82}
+  alloy2FramePadding: 6
+  alloy2FrameIntensity: 0.85
   revealOwner: {fileID: 0}
   scene2Object: 0
   crankReward: {fileID: 0}
@@ -7851,6 +8059,27 @@ MonoBehaviour:
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
   framePaddingPixels: 20
   hoverDistance: 5
+  glassesOutlineColor: {r: 0.55, g: 0.28, b: 0.9, a: 0.34}
+  glassesOutlineIntensity: 1
+  glassesOutlinePower: 2.8
+  glassesSurfaceGlow: 0
+  buttonOutlineColor: {r: 0.55, g: 0.28, b: 0.9, a: 0.34}
+  buttonOutlineIntensity: 1
+  buttonOutlinePower: 2.8
+  buttonSurfaceGlow: 0
+  buttonFramePurple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
+  buttonFrameGreen: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  buttonFramePadding: 6
+  buttonFrameIntensity: 1
+  alloy2OutlineColor: {r: 0.58, g: 0.22, b: 0.92, a: 0.3}
+  alloy2OutlineWidthRatio: 0.0045
+  alloy2GlowIntensity: 0.78
+  alloy2GlowSpread: 1.8
+  alloy2OuterGlowStrength: 0.28
+  alloy2FramePurple: {r: 0.78, g: 0.2, b: 1, a: 0.9}
+  alloy2FrameGreen: {r: 0.15, g: 1, b: 0.42, a: 0.82}
+  alloy2FramePadding: 6
+  alloy2FrameIntensity: 0.85
   revealOwner: {fileID: 0}
   scene2Object: 0
   crankReward: {fileID: 0}
@@ -12361,9 +12590,15 @@ Transform:
   m_GameObject: {fileID: 4751116030537990045}
   serializedVersion: 2
   m_LocalRotation: {x: -0.000000014901165, y: 0.00000008940697, z: 0.9522277, w: -0.30538905}
+<<<<<<< Updated upstream
   m_LocalPosition: {x: 0.0013, y: -0.0018, z: 0.0069}
   m_LocalScale: {x: 24.106892, y: 24.106892, z: 24.106888}
   m_ConstrainProportionsScale: 0
+=======
+  m_LocalPosition: {x: 0, y: -0, z: -0.00051}
+  m_LocalScale: {x: 0.99999994, y: 0.99999994, z: 0.99999994}
+  m_ConstrainProportionsScale: 1
+>>>>>>> Stashed changes
   m_Children: []
   m_Father: {fileID: 4151436659919495962}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -144.437}
@@ -12376,7 +12611,7 @@ Transform:
   m_GameObject: {fileID: 6487921763885965536}
   serializedVersion: 2
   m_LocalRotation: {x: -0.64291394, y: -0, z: -0, w: 0.7659385}
-  m_LocalPosition: {x: 0.00000006202559, y: 1.0272664, z: -0.49043986}
+  m_LocalPosition: {x: 0.00000006202559, y: 0.34726608, z: -0.49043986}
   m_LocalScale: {x: 19.02842, y: 16.269487, z: 15.247471}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -12564,7 +12799,7 @@ Transform:
   m_GameObject: {fileID: 3543575866710664877}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0.22086309, w: 0.97530484}
-  m_LocalPosition: {x: -0.00034, y: 0.00184, z: -0.00067}
+  m_LocalPosition: {x: -0.00034, y: 0.00184, z: -0.00155}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13107,6 +13342,27 @@ MonoBehaviour:
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
   framePaddingPixels: 8
   hoverDistance: 5
+  glassesOutlineColor: {r: 0.55, g: 0.28, b: 0.9, a: 0.34}
+  glassesOutlineIntensity: 1
+  glassesOutlinePower: 2.8
+  glassesSurfaceGlow: 0
+  buttonOutlineColor: {r: 0.55, g: 0.28, b: 0.9, a: 0.34}
+  buttonOutlineIntensity: 1
+  buttonOutlinePower: 2.8
+  buttonSurfaceGlow: 0
+  buttonFramePurple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
+  buttonFrameGreen: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  buttonFramePadding: 6
+  buttonFrameIntensity: 1
+  alloy2OutlineColor: {r: 0.58, g: 0.22, b: 0.92, a: 0.3}
+  alloy2OutlineWidthRatio: 0.0045
+  alloy2GlowIntensity: 0.78
+  alloy2GlowSpread: 1.8
+  alloy2OuterGlowStrength: 0.28
+  alloy2FramePurple: {r: 0.78, g: 0.2, b: 1, a: 0.9}
+  alloy2FrameGreen: {r: 0.15, g: 1, b: 0.42, a: 0.82}
+  alloy2FramePadding: 6
+  alloy2FrameIntensity: 0.85
   revealOwner: {fileID: 0}
   scene2Object: 0
   crankReward: {fileID: 0}
@@ -13506,7 +13762,7 @@ Transform:
   m_GameObject: {fileID: 3258971876614430469}
   serializedVersion: 2
   m_LocalRotation: {x: -0.000000026692547, y: -0.70710677, z: -0.000000026692545, w: 0.7071068}
-  m_LocalPosition: {x: 21.061579, y: 17.19, z: -1.98}
+  m_LocalPosition: {x: 21.061579, y: 16.51, z: -1.98}
   m_LocalScale: {x: 8.054883, y: 7.5488915, z: 9.420806}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -14983,7 +15239,7 @@ Transform:
   m_GameObject: {fileID: 317967201747700274}
   serializedVersion: 2
   m_LocalRotation: {x: -0.4526668, y: -0.022416417, z: -0.0060773427, w: 0.8913773}
-  m_LocalPosition: {x: -0.056462653, y: 1.2695214, z: 0.9764044}
+  m_LocalPosition: {x: -0.056462653, y: 0.58952105, z: 0.9764044}
   m_LocalScale: {x: 19.028421, y: 16.26949, z: 15.247474}
   m_ConstrainProportionsScale: 0
   m_Children: []

@@ -35,7 +35,7 @@ public sealed class Scene2SelfMonitor : MonoBehaviour
         body=Target.GetComponentsInChildren<Renderer>(true);hidden=new bool[body.Length];
         var ui=new GameObject("SurveillanceMonitorUI",typeof(RectTransform),typeof(Canvas),typeof(CanvasScaler));ui.transform.SetParent(transform,false);
         canvas=ui.GetComponent<Canvas>();canvas.renderMode=RenderMode.ScreenSpaceOverlay;canvas.sortingOrder=50;
-        var scaler=ui.GetComponent<CanvasScaler>();scaler.uiScaleMode=CanvasScaler.ScaleMode.ConstantPixelSize;scaler.scaleFactor=1;
+        var scaler=ui.GetComponent<CanvasScaler>();scaler.uiScaleMode=CanvasScaler.ScaleMode.ScaleWithScreenSize;scaler.referenceResolution=new Vector2(1600,900);scaler.screenMatchMode=CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;scaler.matchWidthOrHeight=1;
         var frame=new GameObject("MonitorFrame",typeof(RectTransform),typeof(Image));frame.transform.SetParent(ui.transform,false);
         Frame=frame.GetComponent<RectTransform>();Frame.anchorMin=Frame.anchorMax=Frame.pivot=Vector2.one;
         Frame.anchoredPosition=new Vector2(-1.2000122f,-.7000122f);Frame.sizeDelta=new Vector2(195,120);

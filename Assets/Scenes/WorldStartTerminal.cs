@@ -227,7 +227,8 @@ public sealed class WorldStartTerminal : MonoBehaviour
         }
         if (alpha <= 0f) return;
         EnsureStyles();
-        float scale = Mathf.Clamp(Screen.height / 900f, .78f, 1.18f);
+        float scale = WorldLoreTerminalLayout.Scale(Screen.height);
+        ApplyStyleScale(scale);
         float width = TerminalWidth * scale;
         float height = TerminalHeight * scale;
         Rect box = new Rect(TerminalLeft * scale, Screen.height - height - TerminalMargin * scale, width, height);
@@ -262,7 +263,8 @@ public sealed class WorldStartTerminal : MonoBehaviour
         if (postStartMessageAlpha <= 0f) return;
         EnsureStyles();
         float fade = postStartMessageAlpha;
-        float scale = Mathf.Clamp(Screen.height / 900f, .78f, 1.18f);
+        float scale = WorldLoreTerminalLayout.Scale(Screen.height);
+        ApplyStyleScale(scale);
         Rect box = new Rect(TerminalLeft * scale,
             Screen.height - TerminalHeight * scale - TerminalMargin * scale,
             TerminalWidth * scale, TerminalHeight * scale);
@@ -314,5 +316,12 @@ public sealed class WorldStartTerminal : MonoBehaviour
         GUI.color = new Color(1f, 1f, 1f, alpha);
         GUI.Label(rect, text, style);
         GUI.color = old;
+    }
+
+    private void ApplyStyleScale(float scale)
+    {
+        titleStyle.fontSize = Mathf.Max(1, Mathf.RoundToInt(19f * scale));
+        bodyStyle.fontSize = Mathf.Max(1, Mathf.RoundToInt(14f * scale));
+        promptStyle.fontSize = Mathf.Max(1, Mathf.RoundToInt(12f * scale));
     }
 }

@@ -16,7 +16,7 @@ public sealed class HearingExitDoor : MonoBehaviour
     private Light beam,fill;
     private AudioSource mechanism;
     private AudioClip click,motor,unlock;
-    private float initialListenerVolume,whiteout,originalSide=-1;
+    private float initialListenerVolume,whiteout,blackout,originalSide=-1;
     private FirstPersonPlayer player;
     public bool SequenceStarted{get;private set;}
     public bool IsOpen{get;private set;}
@@ -146,7 +146,13 @@ public sealed class HearingExitDoor : MonoBehaviour
     void Update()
     {
         if(!installation)installation=FindObjectOfType<EarSafeInstallation>();
+<<<<<<< Updated upstream
         if(!SequenceStarted)TryBegin();
+=======
+        // Once both restoration conditions are complete the exit opens
+        // automatically; the player does not need an extra door click.
+        if(!SequenceStarted&&RequirementsMet())TryBegin();
+>>>>>>> Stashed changes
         if(!IsOpen||!Camera.main)return;
         var position=player?player.transform.position:Camera.main.transform.position;
         float side=(position.x-closedBounds.center.x)*originalSide;
@@ -182,6 +188,12 @@ public sealed class HearingExitDoor : MonoBehaviour
         yield return new WaitForSecondsRealtime(.3f);
         yield return AnimateDoor(.085f,1,2.4f);
         IsOpen=true;
+<<<<<<< Updated upstream
+=======
+        blackout=1f;
+        yield return new WaitForSecondsRealtime(3f);
+        SceneManager.LoadScene("scene3",LoadSceneMode.Single);
+>>>>>>> Stashed changes
     }
     IEnumerator AnimateDoor(float from,float to,float duration)
     {
@@ -200,7 +212,11 @@ public sealed class HearingExitDoor : MonoBehaviour
     }
     void OnGUI()
     {
-        if(whiteout<=.001f)return;int depth=GUI.depth;var color=GUI.color;GUI.depth=-1000;GUI.color=new Color(1,1,1,whiteout);GUI.DrawTexture(new Rect(0,0,Screen.width,Screen.height),Texture2D.whiteTexture);GUI.color=color;GUI.depth=depth;
+        if(whiteout<=.001f&&blackout<=.001f)return;
+        int depth=GUI.depth;var color=GUI.color;GUI.depth=-1000;
+        if(whiteout>.001f){GUI.color=new Color(1,1,1,whiteout);GUI.DrawTexture(new Rect(0,0,Screen.width,Screen.height),Texture2D.whiteTexture);}
+        if(blackout>.001f){GUI.color=new Color(0,0,0,blackout);GUI.DrawTexture(new Rect(0,0,Screen.width,Screen.height),Texture2D.whiteTexture);}
+        GUI.color=color;GUI.depth=depth;
     }
     static AudioClip MechanicalClip(string name,float duration,int kind)
     {
