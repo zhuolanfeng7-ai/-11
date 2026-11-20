@@ -10,12 +10,18 @@ using UnityEngine.SceneManagement;
 public static class JiqiControlsSetup
 {
     const string Report = "D:/-11-transfer-audit/controls-20261018/live-editor.json";
+    static void EnsureReportDirectory()
+    {
+        string directory = Path.GetDirectoryName(Report);
+        if (!string.IsNullOrEmpty(directory)) Directory.CreateDirectory(directory);
+    }
     static JiqiControlsSetup() { EditorApplication.delayCall += Apply; EditorApplication.playModeStateChanged += OnPlayMode; }
     static void OnPlayMode(PlayModeStateChange state) { if(state == PlayModeStateChange.EnteredEditMode || state == PlayModeStateChange.EnteredPlayMode) EditorApplication.delayCall += Apply; }
     [MenuItem("Tools/JIQI/Apply Scene2 Controls")]
     public static void Apply()
     {
         if(EditorApplication.isCompiling || EditorApplication.isUpdating) { EditorApplication.delayCall += Apply; return; }
+        EnsureReportDirectory();
         try
         {
             var scene = SceneManager.GetActiveScene();

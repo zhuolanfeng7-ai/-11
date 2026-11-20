@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 [InitializeOnLoad]
 public static class Scene3RestoreVisibility {
- const string Report="D:/-11-scene3-audit/visibility-restored.json";
+ const string Report="Temp/Scene3Audit/visibility-restored.json";
  static Scene3RestoreVisibility(){EditorApplication.delayCall+=Apply;}
  [MenuItem("Tools/Scene3/Restore Visible Scene View")]
  public static void Apply(){
@@ -29,8 +29,8 @@ public static class Scene3RestoreVisibility {
    Selection.activeGameObject=root;SceneView.RepaintAll();
    if(scene.isDirty)EditorSceneManager.SaveScene(scene);
    File.WriteAllText(Report,"{\"renderers\":"+renderers.Length+",\"visibleRenderers\":"+visible.Length+",\"center\":\""+bounds.center+"\",\"size\":\""+bounds.size+"\",\"sceneViewFramed\":true}");
-   EditorApplication.delayCall+=()=>{var cam=view.camera;if(!cam)return;var rt=RenderTexture.GetTemporary(1000,700,24);var old=cam.targetTexture;var active=RenderTexture.active;try{cam.targetTexture=rt;cam.Render();RenderTexture.active=rt;var img=new Texture2D(1000,700,TextureFormat.RGB24,false);img.ReadPixels(new Rect(0,0,1000,700),0,0);img.Apply();File.WriteAllBytes("D:/-11-scene3-audit/scene-view-restored.png",img.EncodeToPNG());UnityEngine.Object.DestroyImmediate(img);}finally{cam.targetTexture=old;RenderTexture.active=active;RenderTexture.ReleaseTemporary(rt);}};
-  }catch(Exception ex){File.WriteAllText("D:/-11-scene3-audit/visibility-error.txt",ex.ToString());Debug.LogException(ex);}
+   EditorApplication.delayCall+=()=>{var cam=view.camera;if(!cam)return;var rt=RenderTexture.GetTemporary(1000,700,24);var old=cam.targetTexture;var active=RenderTexture.active;try{cam.targetTexture=rt;cam.Render();RenderTexture.active=rt;var img=new Texture2D(1000,700,TextureFormat.RGB24,false);img.ReadPixels(new Rect(0,0,1000,700),0,0);img.Apply();File.WriteAllBytes("Temp/Scene3Audit/scene-view-restored.png",img.EncodeToPNG());UnityEngine.Object.DestroyImmediate(img);}finally{cam.targetTexture=old;RenderTexture.active=active;RenderTexture.ReleaseTemporary(rt);}};
+  }catch(Exception ex){File.WriteAllText("Temp/Scene3Audit/visibility-error.txt",ex.ToString());Debug.LogException(ex);}
  }
 }
 

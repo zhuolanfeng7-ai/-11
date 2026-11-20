@@ -31,13 +31,13 @@ public static class BlenderScene3Transfer {
   mat.SetVector(uv,new Vector4(map.scale[0],map.scale[1],map.offset[0],map.offset[1]));
  }
   static int Channel(Map map,Obj ob){if(map==null)return 0;string n=string.IsNullOrEmpty(map.uvName)?ob.activeUV:map.uvName;int index=Array.IndexOf(ob.fbxUVNames,n);if(index<0)return 0;if(index>1)throw new Exception("Unsupported UV channel: "+ob.name);return index;}
- [MenuItem("Tools/Apply Blender Scene2 Materials")] static void Run(){ if(!File.Exists("D:/-11-scene3-audit/ready.flag")||!File.Exists(Folder+"/manifest-corrected.json"))return;
-  string done="D:/-11-scene3-audit/transfer-result.json";
+ [MenuItem("Tools/Apply Blender Scene2 Materials")] static void Run(){ if(!File.Exists("Temp/Scene3Audit/ready.flag")||!File.Exists(Folder+"/manifest-corrected.json"))return;
+  string done="Temp/Scene3Audit/transfer-result.json";
   if(File.Exists(done)||EditorApplication.isPlayingOrWillChangePlaymode)return;
   var s=EditorSceneManager.GetActiveScene();
-  if(s.path!="Assets/Scenes/scene3.unity"){File.WriteAllText("D:/-11-scene3-audit/transfer-status.txt","Waiting: Scene2 must be active and saved");return;}
+  if(s.path!="Assets/Scenes/scene3.unity"){File.WriteAllText("Temp/Scene3Audit/transfer-status.txt","Waiting: Scene2 must be active and saved");return;}
   try{
-   EditorSceneManager.SaveScene(s);if(!File.Exists("D:/-11-scene3-audit/scene3.saved-before.unity"))File.Copy(s.path,"D:/-11-scene3-audit/scene3.saved-before.unity");
+   EditorSceneManager.SaveScene(s);if(!File.Exists("Temp/Scene3Audit/scene3.saved-before.unity"))File.Copy(s.path,"Temp/Scene3Audit/scene3.saved-before.unity");
    var model=AssetDatabase.LoadAssetAtPath<GameObject>(Folder+"/CompanySource.fbx");if(!model)throw new Exception("Source FBX not imported"); if(!s.GetRootGameObjects().Any(g=>g.name=="CompanySource")){var instance=(GameObject)PrefabUtility.InstantiatePrefab(model,s);instance.name="CompanySource";Undo.RegisterCreatedObjectUndo(instance,"Import Blender company scene");}
    var manifest=JsonUtility.FromJson<Manifest>(File.ReadAllText(Folder+"/manifest-corrected.json"));
    var shader=Shader.Find("BlenderScene3/PrincipledTransfer");if(shader==null)throw new Exception("Transfer shader missing");
@@ -81,10 +81,10 @@ public static class BlenderScene3Transfer {
    foreach(var rr in renderers.Where(x=>x.name=="table"||x.name=="table2"||x.sharedMaterials.Any(mm=>mm && mm.name.Contains("Holographic Iridescence")))){var path=Folder+"/Materials/SourceIridescence.mat";var hologram=AssetDatabase.LoadAssetAtPath<Material>(path);if(!hologram){hologram=new Material(Shader.Find("BlenderScene3/SourceIridescence"));AssetDatabase.CreateAsset(hologram,path);}hologram.SetTexture("_FacingLUT",lut);EditorUtility.SetDirty(hologram);var arr=rr.sharedMaterials;for(int j=0;j<arr.Length;j++)arr[j]=hologram;Undo.RecordObject(rr,"Restore Blender holographic tables");rr.sharedMaterials=arr;PrefabUtility.RecordPrefabInstancePropertyModifications(rr);notes.Add("IRIDESCENCE_RESTORED|"+rr.name);}
 AssetDatabase.SaveAssets();EditorSceneManager.MarkSceneDirty(s);EditorSceneManager.SaveScene(s);
    foreach(var pair in assignments)for(int i=0;i<pair.Item2.Length;i++)if(pair.Item1.name!="table"&&pair.Item1.name!="table2"&&!pair.Item1.sharedMaterials.Any(mm=>mm&&mm.shader.name=="BlenderScene3/SourceIridescence")&&pair.Item1.sharedMaterials[i]!=pair.Item2[i])throw new Exception("Assignment verification failed");
-   File.WriteAllLines("D:/-11-scene3-audit/material-bindings.txt",notes);
+   File.WriteAllLines("Temp/Scene3Audit/material-bindings.txt",notes);
    File.WriteAllText(done,"{\"convertedMaterials\":"+boundNames.Count+",\"assignedSlots\":"+slots+",\"verifiedRenderers\":"+assignments.Count+",\"complete\":false,\"lightingVerified\":false}");
-   if(cam){var rt=RenderTexture.GetTemporary(960,640,24,RenderTextureFormat.ARGB32);var prev=cam.targetTexture;var active=RenderTexture.active;try{cam.targetTexture=rt;cam.Render();RenderTexture.active=rt;var pic=new Texture2D(960,640,TextureFormat.RGB24,false);pic.ReadPixels(new Rect(0,0,960,640),0,0);pic.Apply();File.WriteAllBytes("D:/-11-scene3-audit/unity-preview.png",pic.EncodeToPNG());UnityEngine.Object.DestroyImmediate(pic);}finally{cam.targetTexture=prev;RenderTexture.active=active;RenderTexture.ReleaseTemporary(rt);}}Debug.Log("Scene3 Blender transfer saved and verified");
-  }catch(Exception ex){File.WriteAllText("D:/-11-scene3-audit/transfer-error.txt",ex.ToString());Debug.LogException(ex);}
+   if(cam){var rt=RenderTexture.GetTemporary(960,640,24,RenderTextureFormat.ARGB32);var prev=cam.targetTexture;var active=RenderTexture.active;try{cam.targetTexture=rt;cam.Render();RenderTexture.active=rt;var pic=new Texture2D(960,640,TextureFormat.RGB24,false);pic.ReadPixels(new Rect(0,0,960,640),0,0);pic.Apply();File.WriteAllBytes("Temp/Scene3Audit/unity-preview.png",pic.EncodeToPNG());UnityEngine.Object.DestroyImmediate(pic);}finally{cam.targetTexture=prev;RenderTexture.active=active;RenderTexture.ReleaseTemporary(rt);}}Debug.Log("Scene3 Blender transfer saved and verified");
+  }catch(Exception ex){File.WriteAllText("Temp/Scene3Audit/transfer-error.txt",ex.ToString());Debug.LogException(ex);}
  }
 }
 

@@ -19,7 +19,7 @@ public class DoorCodePuzzleController : MonoBehaviour
 
     [Header("Exit transition")]
     [Tooltip("Optional. Fill this with the next scene's exact name once it exists.")]
-    [SerializeField] private string nextSceneName = "";
+    [SerializeField] private string nextSceneName = "scene 2";
     [SerializeField] private Color doorwayGlowColor = new Color(1f, .72f, .38f, 1f);
     [SerializeField, Min(.1f)] private float transitionFadeSeconds = 1.1f;
 
@@ -43,6 +43,7 @@ public class DoorCodePuzzleController : MonoBehaviour
         // inspector serialization from a previous scene reload.
         correctCode = "20040214";
         codeLength = 8;
+        nextSceneName = "scene 2";
         FindDoor();
         SuppressAccidentalPickupBehaviour();
     }
@@ -414,7 +415,10 @@ public class DoorCodePuzzleController : MonoBehaviour
     {
         float scale = Mathf.Clamp(Screen.height / 900f, .75f, 1.25f);
         float width = 430f * scale;
-        float height = 420f * scale;
+        // Four keypad rows occupy about 483 scaled pixels below the panel's
+        // top edge. The former 420 value left 0/delete/confirm outside the
+        // clickable panel, so Update treated those buttons as an outside click.
+        float height = 510f * scale;
         return new Rect((Screen.width - width) * .5f, (Screen.height - height) * .5f - 25f * scale, width, height);
     }
 }

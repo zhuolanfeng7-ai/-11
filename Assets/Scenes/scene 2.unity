@@ -166,6 +166,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}
@@ -440,6 +442,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}
@@ -484,6 +488,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}
@@ -528,6 +534,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}
@@ -1170,6 +1178,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}
@@ -1269,6 +1279,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}
@@ -1631,6 +1643,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}
@@ -1675,6 +1689,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}
@@ -1719,6 +1735,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}
@@ -1774,7 +1792,7 @@ MonoBehaviour:
   unlockReward: {fileID: 2103538487}
   linkedDrum: {fileID: 612898534}
   drumAxisLocal: {x: -0.99990296, y: -0.009794205, z: 0.009904087}
-  drumCenterLocal: {x: 0.00014212521, y: -0.000062517945, z: -0.000019807716}
+  drumCenterLocal: {x: 0.0001421252, y: -0.000062517945, z: -0.000019807714}
   gears:
   - part: {fileID: 707227012}
     axisLocal: {x: 0.8718652, y: 0.48782775, z: 0.043304086}
@@ -2232,6 +2250,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}
@@ -2367,6 +2387,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}
@@ -4380,6 +4402,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ee4dfbcacd31c5e4581e143990e56965, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1356263029}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ee4dfbcacd31c5e4581e143990e56965, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1356263031}
     - targetCorrespondingSourceObject: {fileID: -5994856646759909028, guid: ee4dfbcacd31c5e4581e143990e56965, type: 3}
       insertIndex: -1
       addedObject: {fileID: 933974587}
@@ -4915,7 +4940,7 @@ VideoPlayer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1356263025}
   m_Enabled: 1
-  m_VideoClip: {fileID: 32900000, guid: 527015d853ac15747afd1df3b3a83f26, type: 3}
+  m_VideoClip: {fileID: 0}
   m_TargetCameraAlpha: 1
   m_TargetCamera3DLayout: 0
   m_TargetCamera: {fileID: 0}
@@ -4925,7 +4950,7 @@ VideoPlayer:
   m_TargetMaterialProperty: _MainTex
   m_RenderMode: 3
   m_AspectRatio: 2
-  m_DataSource: 0
+  m_DataSource: 1
   m_TimeUpdateMode: 2
   m_PlaybackSpeed: 1
   m_AudioOutputMode: 0
@@ -4933,7 +4958,7 @@ VideoPlayer:
   - {fileID: 0}
   m_DirectAudioVolumes:
   - 1
-  m_Url: 
+  m_Url: "E:/SIA\u6E38\u620F\u52A8\u753B/\u5728\u7814\u9879\u76EE/4\u51AF\u712F\u5C9A/Github_ZhuoLan/-11/Assets/StreamingAssets/Videos/scene2_ad.mp4"
   m_EnabledAudioTracks: 00
   m_DirectAudioMutes: 01
   m_ControlledAudioTrackCount: 1
@@ -4990,6 +5015,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: ee4dfbcacd31c5e4581e143990e56965, type: 3}
   m_PrefabInstance: {fileID: 1314539345}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1356263031
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1356263025}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19234a3ea94c4fb4cae451ac146069de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  streamingAssetsRelativePath: Videos/scene2_ad.mp4
 --- !u!1 &1409182866 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -4515741422948832728, guid: ee4dfbcacd31c5e4581e143990e56965, type: 3}
@@ -5143,6 +5181,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}
@@ -5441,6 +5481,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}
@@ -5597,6 +5639,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}
@@ -5797,6 +5841,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 160
   revealOwner: {fileID: 0}
@@ -6423,6 +6469,8 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.55
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 1202081719}
@@ -6644,40 +6692,19 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 368399ce36808e8479600290bd72b6b6, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2093464443}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 368399ce36808e8479600290bd72b6b6, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 2093464448}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 368399ce36808e8479600290bd72b6b6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2093464447}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 368399ce36808e8479600290bd72b6b6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2093464451}
   m_SourcePrefab: {fileID: 100100000, guid: 368399ce36808e8479600290bd72b6b6, type: 3}
 --- !u!1 &2093464442 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 368399ce36808e8479600290bd72b6b6, type: 3}
   m_PrefabInstance: {fileID: 2093464441}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &2093464443
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2093464442}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.27975658, y: 0.30563024, z: 0.8786344}
-  m_Center: {x: -0.0030515196, y: -1.0437401e-13, z: 0.43931714}
 --- !u!4 &2093464444 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 368399ce36808e8479600290bd72b6b6, type: 3}
@@ -6728,6 +6755,29 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 116
   m_CollisionDetection: 2
+--- !u!136 &2093464451
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2093464442}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.13
+  m_Height: 1.06
+  m_Direction: 2
+  m_Center: {x: 5.044258e-10, y: 5.0884136e-10, z: 0.4883613}
 --- !u!1 &2103538485 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2601914626679394041, guid: ee4dfbcacd31c5e4581e143990e56965, type: 3}
@@ -6749,6 +6799,11 @@ MonoBehaviour:
   viewCamera: {fileID: 0}
   purple: {r: 0.78, g: 0.2, b: 1, a: 0.95}
   green: {r: 0.15, g: 1, b: 0.42, a: 0.9}
+<<<<<<< Updated upstream
+=======
+  pickupFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  pickupFlashIntensity: 0.3
+>>>>>>> Stashed changes
   framePaddingPixels: 6
   hoverDistance: 100
   revealOwner: {fileID: 0}

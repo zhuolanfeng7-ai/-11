@@ -8,7 +8,7 @@ public sealed class HearingExitDoor : MonoBehaviour
 {
     private EarSafeInstallation installation;
     private Scene2RepairCelebration repairState;
-    private Transform leaf,seal,hinge;
+    private Transform leaf,seal,hinge,ear;
     private Bounds closedBounds;
     private Renderer backdrop,haze;
     private Material whiteMaterial,mistMaterial;
@@ -16,7 +16,12 @@ public sealed class HearingExitDoor : MonoBehaviour
     private Light beam,fill;
     private AudioSource mechanism;
     private AudioClip click,motor,unlock;
+<<<<<<< Updated upstream
     private float initialListenerVolume,whiteout,originalSide=-1;
+=======
+    private float initialListenerVolume,whiteout,blackout,originalSide=-1;
+    private bool cheatArmed;
+>>>>>>> Stashed changes
     private FirstPersonPlayer player;
     public bool SequenceStarted{get;private set;}
     public bool IsOpen{get;private set;}
@@ -36,6 +41,7 @@ public sealed class HearingExitDoor : MonoBehaviour
     {
         var all=gameObject.scene.GetRootGameObjects().SelectMany(r=>r.GetComponentsInChildren<Transform>(true)).ToArray();
         leaf=all.FirstOrDefault(t=>t.name.Equals("door",StringComparison.OrdinalIgnoreCase));
+        ear=all.FirstOrDefault(t=>t.name.Equals("ear",StringComparison.OrdinalIgnoreCase));
         installation=FindObjectOfType<EarSafeInstallation>();player=FindObjectOfType<FirstPersonPlayer>();
         if(!leaf||!leaf.GetComponent<Renderer>()){enabled=false;return;}
         closedBounds=leaf.GetComponent<Renderer>().bounds;initialListenerVolume=AudioListener.volume;
@@ -146,7 +152,15 @@ public sealed class HearingExitDoor : MonoBehaviour
     void Update()
     {
         if(!installation)installation=FindObjectOfType<EarSafeInstallation>();
+<<<<<<< Updated upstream
         if(!SequenceStarted)TryBegin();
+=======
+        if(!SequenceStarted&&Input.GetKeyDown(KeyCode.O))cheatArmed=true;
+        if(cheatArmed&&!SequenceStarted&&Input.GetMouseButtonDown(0)&&ClickedEar())TryBegin(true);
+        // Once both restoration conditions are complete the exit opens
+        // automatically; the player does not need an extra door click.
+        if(!SequenceStarted&&RequirementsMet())TryBegin();
+>>>>>>> Stashed changes
         if(!IsOpen||!Camera.main)return;
         var position=player?player.transform.position:Camera.main.transform.position;
         float side=(position.x-closedBounds.center.x)*originalSide;
@@ -159,8 +173,28 @@ public sealed class HearingExitDoor : MonoBehaviour
     }
     public bool TryBegin()
     {
-        if(SequenceStarted||!leaf||!RequirementsMet())return false;
-        SequenceStarted=true;StartCoroutine(OpenSequence());return true;
+        return TryBegin(false);
+    }
+    private bool TryBegin(bool bypassRequirements)
+    {
+        if(SequenceStarted||!leaf||(!bypassRequirements&&!RequirementsMet()))return false;
+        cheatArmed=false;SequenceStarted=true;StartCoroutine(OpenSequence());return true;
+    }
+    private bool ClickedEar()
+    {
+        if(!ear)
+            ear=gameObject.scene.GetRootGameObjects().SelectMany(r=>r.GetComponentsInChildren<Transform>(true))
+                .FirstOrDefault(t=>t.name.Equals("ear",StringComparison.OrdinalIgnoreCase));
+        var camera=Camera.main;
+        if(!ear||!camera||EvidenceInspect.BlocksWorldInput)return false;
+        Vector2 pointer=Cursor.lockState==CursorLockMode.Locked?camera.pixelRect.center:(Vector2)Input.mousePosition;
+        if(!camera.pixelRect.Contains(pointer))return false;
+        foreach(var hit in Physics.RaycastAll(camera.ScreenPointToRay(pointer),1000f,~((1<<30)|(1<<31)),QueryTriggerInteraction.Ignore).OrderBy(h=>h.distance))
+        {
+            if(hit.collider.GetComponentInParent<FirstPersonPlayer>())continue;
+            return hit.transform==ear||hit.transform.IsChildOf(ear);
+        }
+        return false;
     }
     public bool RequirementsMet()
     {
@@ -182,6 +216,12 @@ public sealed class HearingExitDoor : MonoBehaviour
         yield return new WaitForSecondsRealtime(.3f);
         yield return AnimateDoor(.085f,1,2.4f);
         IsOpen=true;
+<<<<<<< Updated upstream
+=======
+        blackout=1f;
+        yield return new WaitForSecondsRealtime(3f);
+        SceneManager.LoadScene("scene3",LoadSceneMode.Single);
+>>>>>>> Stashed changes
     }
     IEnumerator AnimateDoor(float from,float to,float duration)
     {
