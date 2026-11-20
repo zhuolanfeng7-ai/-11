@@ -82,7 +82,7 @@
       "depth": 1,
       "source": "registry",
       "dependencies": {},
-      "url": "https://packages.unity.com"
+      "url": "https://packages.unity.cn"
     },
     "com.unity.performance.profile-analyzer": {
       "version": "1.2.3",

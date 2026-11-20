@@ -10,8 +10,6 @@ public sealed class Robot3FirstPerson : MonoBehaviour
     [SerializeField] private float lookLimit = 80f;
     private float yaw;
     private float pitch;
-<<<<<<< Updated upstream
-=======
     private Rigidbody body;
     private CapsuleCollider capsule;
     private Vector2 moveInput;
@@ -38,7 +36,6 @@ public sealed class Robot3FirstPerson : MonoBehaviour
         body.constraints = StableConstraints;
         if (capsule) { capsule.enabled = true; capsule.isTrigger = false; }
     }
->>>>>>> Stashed changes
 
     private void Start()
     {
@@ -57,12 +54,8 @@ public sealed class Robot3FirstPerson : MonoBehaviour
         float deltaYaw = Input.GetAxisRaw("Mouse X") * mouseSensitivity;
         yaw += deltaYaw;
         pitch = Mathf.Clamp(pitch - Input.GetAxisRaw("Mouse Y") * mouseSensitivity, -lookLimit, lookLimit);
-        transform.rotation = Quaternion.AngleAxis(deltaYaw, Vector3.up) * transform.rotation;
+
         eyeCamera.transform.rotation = Quaternion.Euler(pitch, yaw, 0f);
-<<<<<<< Updated upstream
-        Vector2 keys = new Vector2((Input.GetKey(KeyCode.D) ? 1f : 0f) - (Input.GetKey(KeyCode.A) ? 1f : 0f), (Input.GetKey(KeyCode.W) ? 1f : 0f) - (Input.GetKey(KeyCode.S) ? 1f : 0f));
-        keys = Vector2.ClampMagnitude(keys, 1f);
-=======
         moveInput = new Vector2((Input.GetKey(KeyCode.D) ? 1f : 0f) - (Input.GetKey(KeyCode.A) ? 1f : 0f), (Input.GetKey(KeyCode.W) ? 1f : 0f) - (Input.GetKey(KeyCode.S) ? 1f : 0f));
         moveInput = Vector2.ClampMagnitude(moveInput, 1f);
     }
@@ -92,10 +85,10 @@ public sealed class Robot3FirstPerson : MonoBehaviour
         if (Mathf.Abs(position.y - lockedWorldY) > .001f)
             body.position = new Vector3(position.x, lockedWorldY, position.z);
 
->>>>>>> Stashed changes
         Vector3 forward = Quaternion.Euler(0f, yaw, 0f) * Vector3.forward;
         Vector3 right = Quaternion.Euler(0f, yaw, 0f) * Vector3.right;
-        transform.position += (forward * keys.y + right * keys.x) * (moveSpeed * Time.deltaTime);
+        Vector3 movement = Application.isFocused && Cursor.lockState == CursorLockMode.Locked ? (forward * moveInput.y + right * moveInput.x) * (moveSpeed * Time.fixedDeltaTime) : Vector3.zero;
+        body.MovePosition(body.position + movement);
     }
     private void OnDisable() { Cursor.lockState = CursorLockMode.None; Cursor.visible = true; }
     private void OnApplicationFocus(bool focused) { if (!focused) { Cursor.lockState = CursorLockMode.None; Cursor.visible = true; } }

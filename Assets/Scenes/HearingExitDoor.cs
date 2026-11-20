@@ -146,13 +146,9 @@ public sealed class HearingExitDoor : MonoBehaviour
     void Update()
     {
         if(!installation)installation=FindObjectOfType<EarSafeInstallation>();
-<<<<<<< Updated upstream
-        if(!SequenceStarted)TryBegin();
-=======
         // Once both restoration conditions are complete the exit opens
         // automatically; the player does not need an extra door click.
         if(!SequenceStarted&&RequirementsMet())TryBegin();
->>>>>>> Stashed changes
         if(!IsOpen||!Camera.main)return;
         var position=player?player.transform.position:Camera.main.transform.position;
         float side=(position.x-closedBounds.center.x)*originalSide;
@@ -188,12 +184,9 @@ public sealed class HearingExitDoor : MonoBehaviour
         yield return new WaitForSecondsRealtime(.3f);
         yield return AnimateDoor(.085f,1,2.4f);
         IsOpen=true;
-<<<<<<< Updated upstream
-=======
         blackout=1f;
         yield return new WaitForSecondsRealtime(3f);
         SceneManager.LoadScene("scene3",LoadSceneMode.Single);
->>>>>>> Stashed changes
     }
     IEnumerator AnimateDoor(float from,float to,float duration)
     {

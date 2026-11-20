@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+using System.Collections.Generic;
+using UnityEngine.Rendering;
+using UnityEngine;
 
 /// <summary>
 /// Draws the hover scanner in OnGUI, after the camera's black-and-white/blur effect.
@@ -44,16 +46,13 @@ public sealed class HoverScanHighlight : MonoBehaviour
     [SerializeField, Range(2f, 20f)] private float alloy2FramePadding = 6f;
     [SerializeField, Range(0f, 2f)] private float alloy2FrameIntensity = .85f;
 
+    [SerializeField] private Color pickupFlashColor = Color.white;
+    [SerializeField, Min(0f)] private float pickupFlashIntensity = 1f;
     private Texture2D purpleFrame;
     private Texture2D greenFrame;
     private Transform lavenderOverlayRoot;
     private Camera overlayCamera;
     private Material lavenderMaterial;
-<<<<<<< Updated upstream
-    private FirstPersonPlayer player;
-    private Rect hoverRect;
-    private bool hovered;
-=======
     private Material repairOutlineMaterial;
     private Material alloy2OuterGlowMaterial;
     private Material whiteGlowMaterial;
@@ -74,7 +73,6 @@ public sealed class HoverScanHighlight : MonoBehaviour
     private readonly List<Transform> overlayProxies = new List<Transform>();
     private readonly List<MeshRenderer> overlayRenderers = new List<MeshRenderer>();
 
->>>>>>> Stashed changes
     private TelescopingDevice telescopingDevice;
     [SerializeField] private TubeRewardReveal revealOwner;
     private bool sharedDeviceOverlay;
@@ -109,12 +107,6 @@ public sealed class HoverScanHighlight : MonoBehaviour
         framePaddingPixels = paddingPixels;
         hoverDistance = maximumDistance;
     }
-<<<<<<< Updated upstream
-
-    public void ConfigureReward(TubeRewardReveal owner){revealOwner=owner;}
-    public void ConfigureScene2(){scene2Object=true;}
-    public void ConfigureCrankReward(MusicBoxRewardLift reward){crankReward=reward;scene2Object=true;}
-=======
     public void ConfigureViewCamera(Camera camera){if(camera)viewCamera=camera;}
     public void SetPersistentHighlight(bool value){persistentHighlight=value;}
     public void ConfigureVisualRoot(Transform root)
@@ -161,7 +153,6 @@ public sealed class HoverScanHighlight : MonoBehaviour
             pickupFlashColor.b,
             pickupFlashColor.a * intensity));
     }
->>>>>>> Stashed changes
 
     private void Update()
     {
@@ -171,17 +162,6 @@ public sealed class HoverScanHighlight : MonoBehaviour
         SetOverlayVisible(false);
         if (viewCamera == null) return;
         SyncOverlayCamera();
-<<<<<<< Updated upstream
-        Ray ray = viewCamera.ScreenPointToRay(Input.mousePosition);
-        if (!Physics.Raycast(ray, out RaycastHit hit, 100f, ~0, QueryTriggerInteraction.Collide)) return;
-        if (hit.transform != transform && !hit.transform.IsChildOf(transform)) return;
-        Transform distanceOrigin = player != null ? player.transform : viewCamera.transform;
-        if (Vector3.Distance(distanceOrigin.position, hit.collider.ClosestPoint(distanceOrigin.position)) > hoverDistance) return;
-        hovered = TryGetScreenRect(out hoverRect);
-        if (lavenderOverlayRoot != null) lavenderOverlayRoot.gameObject.SetActive(hovered);
-    }
-
-=======
         SyncOverlayVisuals();
 
         if (forcedHighlight)
@@ -220,7 +200,6 @@ public sealed class HoverScanHighlight : MonoBehaviour
         SetOverlayVisible(hovered);
         return hovered;
     }
->>>>>>> Stashed changes
     private void LateUpdate()
     {
         if (telescopingDevice == null && revealOwner == null && !scene2Object) return;
@@ -403,22 +382,6 @@ public sealed class HoverScanHighlight : MonoBehaviour
         // A second camera renders these proxy meshes after the monochrome camera effect.
         // The original glasses stay untouched for gameplay, colliders, and pickup.
         const int overlayLayer = 31;
-<<<<<<< Updated upstream
-        sharedDeviceOverlay=telescopingDevice != null || revealOwner != null || scene2Object;
-        GameObject cameraObject=sharedDeviceOverlay ? GameObject.Find("Scene2 Hover Overlay Camera") : null;
-        if(cameraObject==null){
-            cameraObject=new GameObject(sharedDeviceOverlay ? "Scene2 Hover Overlay Camera" : "Lavender Hover Overlay Camera");
-            overlayCamera=cameraObject.AddComponent<Camera>();
-        } else overlayCamera=cameraObject.GetComponent<Camera>();
-        // Preserve the main camera's depth buffer.  Clearing it here made a hidden
-        // object (such as the Film inside the drawer) appear to glow through the
-        // drawer and book, which visually detached the glow from the Film.
-        overlayCamera.clearFlags = CameraClearFlags.Nothing;
-        overlayCamera.cullingMask = 1 << overlayLayer;
-        overlayCamera.depth = viewCamera != null ? viewCamera.depth + 10f : 10f;
-        overlayCamera.allowHDR = false;
-        overlayCamera.allowMSAA = true;
-=======
         if (!backGlowOnly)
         {
             GameObject cameraObject = new GameObject("Lavender Hover Overlay Camera");
@@ -436,17 +399,12 @@ public sealed class HoverScanHighlight : MonoBehaviour
             // active proxy again, producing duplicate/offset silhouettes.
             overlayCamera.enabled = false;
         }
->>>>>>> Stashed changes
         Shader rimShader = Shader.Find("Custom/HoverLavenderRim");
         if (rimShader == null) return;
         // Scene2 uses the same dedicated overlay layer as the Scene1 scanner.
         // Render its tint only once, through the overlay camera.
         if (sharedDeviceOverlay && viewCamera != null) viewCamera.cullingMask &= ~(1 << overlayLayer);
         lavenderMaterial = new Material(rimShader);
-<<<<<<< Updated upstream
-        lavenderMaterial.SetColor("_RimColor", new Color(.55f, .28f, .90f, .34f));
-        lavenderMaterial.SetFloat("_RimPower", 2.8f);
-=======
         Color repairTint = subtleAlloy2Highlight ? new Color(.58f, .25f, .92f, .25f) : new Color(.70f, .28f, 1f, .72f);
         lavenderMaterial.SetColor("_RimColor", backGlowOnly ? repairTint : glassesHighlight ? glassesOutlineColor : buttonHighlight ? buttonOutlineColor : new Color(.55f, .28f, .90f, .34f));
         lavenderMaterial.SetColor("_AccentColor", new Color(.18f, 1f, .48f, .55f));
@@ -470,7 +428,6 @@ public sealed class HoverScanHighlight : MonoBehaviour
         whiteGlowMaterial.SetFloat("_FullSurfaceGlow", 1f);
         whiteGlowMaterial.SetInt("_SrcBlend", (int)BlendMode.One);
         whiteGlowMaterial.SetInt("_DstBlend", (int)BlendMode.One);
->>>>>>> Stashed changes
 
         lavenderOverlayRoot = new GameObject(backGlowOnly ? "Repair Part Aligned Highlight" : "Lavender Glasses Hover Overlay").transform;
         if (backGlowOnly)
@@ -479,10 +436,6 @@ public sealed class HoverScanHighlight : MonoBehaviour
             CopyLocalTransform(visualRoot, lavenderOverlayRoot);
         }
         MeshFilter[] filters = visualRoot.GetComponentsInChildren<MeshFilter>(true);
-<<<<<<< Updated upstream
-        var sources=new System.Collections.Generic.List<MeshFilter>();
-        var proxies=new System.Collections.Generic.List<Transform>();
-=======
         if (backGlowOnly)
         {
             lavenderMaterial.SetFloat("_OutlineWidth", 0f);
@@ -513,18 +466,10 @@ public sealed class HoverScanHighlight : MonoBehaviour
                 alloy2OuterGlowMaterial.SetFloat("_OutlineWidth", Mathf.Max(.0005f, meshSize * alloy2OutlineWidthRatio * alloy2GlowSpread));
             }
         }
->>>>>>> Stashed changes
         foreach (MeshFilter source in filters)
         {
             if (source.sharedMesh == null) continue;
             GameObject proxy = new GameObject(source.name + " Lavender Proxy");
-<<<<<<< Updated upstream
-            sources.Add(source);proxies.Add(proxy.transform);
-            proxy.layer = overlayLayer;
-            proxy.transform.SetParent(lavenderOverlayRoot, true);
-            proxy.transform.SetPositionAndRotation(source.transform.position, source.transform.rotation);
-            proxy.transform.localScale = source.transform.lossyScale;
-=======
             proxy.layer = backGlowOnly ? source.gameObject.layer : overlayLayer;
             if (backGlowOnly)
             {
@@ -548,7 +493,6 @@ public sealed class HoverScanHighlight : MonoBehaviour
                 proxy.transform.SetPositionAndRotation(source.transform.position, source.transform.rotation);
                 proxy.transform.localScale = source.transform.lossyScale;
             }
->>>>>>> Stashed changes
             MeshFilter filter = proxy.AddComponent<MeshFilter>();
             filter.sharedMesh = source.sharedMesh;
             MeshRenderer renderer = proxy.AddComponent<MeshRenderer>();
@@ -556,14 +500,6 @@ public sealed class HoverScanHighlight : MonoBehaviour
             Material[] materials = new Material[materialCount];
             for (int i = 0; i < materials.Length; i++) materials[i] = lavenderMaterial;
             renderer.sharedMaterials = materials;
-<<<<<<< Updated upstream
-        }
-        proxySources=sources.ToArray();proxyTransforms=proxies.ToArray();
-        lavenderOverlayRoot.gameObject.SetActive(false);
-        SyncOverlayCamera();
-    }
-
-=======
             renderer.shadowCastingMode = ShadowCastingMode.Off;
             renderer.receiveShadows = false;
             // alloy2 only needs the outer purple contour. Its exact-surface
@@ -698,7 +634,6 @@ public sealed class HoverScanHighlight : MonoBehaviour
         }
     }
 
->>>>>>> Stashed changes
     private void SyncOverlayCamera()
     {
         if (overlayCamera == null || viewCamera == null) return;
@@ -711,12 +646,6 @@ public sealed class HoverScanHighlight : MonoBehaviour
 
     private bool TryGetScreenRect(out Rect result)
     {
-<<<<<<< Updated upstream
-        Renderer[] renderers = visualRoot.GetComponentsInChildren<Renderer>(true);
-        if (renderers.Length == 0) { result = default; return false; }
-        Bounds bounds = renderers[0].bounds;
-        for (int i = 1; i < renderers.Length; i++) bounds.Encapsulate(renderers[i].bounds);
-=======
         result=default;
         if(!visualRoot||!visualRoot.gameObject.activeInHierarchy)return false;
         bool hasVisibleSource=false;
@@ -728,7 +657,6 @@ public sealed class HoverScanHighlight : MonoBehaviour
             else bounds.Encapsulate(renderer.bounds);
         }
         if(!hasVisibleSource)return false;
->>>>>>> Stashed changes
         Vector3 min = bounds.min, max = bounds.max;
         Vector3[] corners =
         {
@@ -778,13 +706,8 @@ public sealed class HoverScanHighlight : MonoBehaviour
         // The purple rim is rendered by a separate overlay object, so disabling
         // the pickup model alone would otherwise leave that proxy visible.
         hovered = false;
-<<<<<<< Updated upstream
-        if (lavenderOverlayRoot != null)
-            lavenderOverlayRoot.gameObject.SetActive(false);
-=======
         forcedHighlight = false;
         SetOverlayVisible(false);
->>>>>>> Stashed changes
     }
 
     private void OnDestroy()
@@ -792,12 +715,9 @@ public sealed class HoverScanHighlight : MonoBehaviour
         if (purpleFrame != null) Destroy(purpleFrame);
         if (greenFrame != null) Destroy(greenFrame);
         if (lavenderMaterial != null) Destroy(lavenderMaterial);
-<<<<<<< Updated upstream
-=======
         if (repairOutlineMaterial != null) Destroy(repairOutlineMaterial);
         if (alloy2OuterGlowMaterial != null) Destroy(alloy2OuterGlowMaterial);
         if (whiteGlowMaterial != null) Destroy(whiteGlowMaterial);
->>>>>>> Stashed changes
         if (lavenderOverlayRoot != null) Destroy(lavenderOverlayRoot.gameObject);
         if (overlayCamera != null && !sharedDeviceOverlay) Destroy(overlayCamera.gameObject);
     }
